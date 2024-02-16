@@ -1,0 +1,25 @@
+body{
+    background-color: black;
+    color: white;
+}
+.container{
+
+}
+
+audio {
+    width: 100%;
+    margin: 0 auto;
+}
+
+audio::-webkit-media-controls-panel {
+    background-color: #333;
+    color: #fff;
+    border-radius: 0px;
+    /* Add more styles as needed */
+}
+
+audio::-webkit-media-controls-volume-slider {
+    position: absolute;
+    background-color: #999;
+    /* Add more styles as needed */
+}

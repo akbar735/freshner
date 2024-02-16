@@ -1,0 +1,18 @@
+.audi-bar{
+    position: relative;
+    height: 40px;
+    background-color: rgb(255 203 2 / 30%);
+    margin-bottom: 10px;
+}
+
+.center-vertical{
+    position: absolute;
+    top: 50%; 
+    transform: translateY(-50%);
+}
+.m-l-20{
+    margin-left: 20px;
+}
+.play-pause{
+    cursor: pointer;
+}
