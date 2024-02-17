@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import AudioSlider from "./components/audio-slider/AudioSlider";
@@ -25,6 +25,10 @@ interface IAudioBar{
     playNext: (arg0: number) => void;
     isAudioPlaying: (arg0: number) => boolean;
     ownRef: HTMLAudioElement | null;
+    allFileDetail: {
+          name: string;
+          src: string;
+    }
 }
 const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudioBar, ref){
    const [totalDuration, setTotalDuration] = useState<number|null>(null);
@@ -45,6 +49,7 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
         const duration: number = (event.target as HTMLMediaElement).duration;
         setTotalDuration(duration);
    }
+   console.log("allFileDetail:::", props.allFileDetail)
    useEffect(() => {
         audioRef.current?.addEventListener('timeupdate',handleAudioTimeUpdate);
         audioRef.current?.addEventListener('loadedmetadata',handleLoadedMetaData);
@@ -65,11 +70,20 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
           setLoop(true)
    }, [audioRef.current])
 
+   const updateCurrentTime = (event: ChangeEvent<HTMLInputElement>) => {
+     const audio = audioRef.current;
+     const newTime = parseFloat(event.target.value);
+ 
+     if (audio) {
+       audio.currentTime = newTime;
+       setCurrentTime(newTime);
+     }
+   }
     return (
      <div> 
           <div className="audi-bar">
-               
-               <AudioSlider totalDuration= {totalDuration}  currentTime= {currentTime}/>
+               {/* <div>{props.allFileDetail.name}</div> */}
+               <AudioSlider totalDuration= {totalDuration} updateCurrentTime = {updateCurrentTime}  currentTime= {currentTime}/>
                <div className="play-controls">
                     {props.index === 0 || !props.isAudioPlaying(props.index) ?  <NavigateBeforeIcon style={{color: 'grey'}} /> 
                     :  <NavigateBeforeIcon style={{cursor: 'pointer'}}  onClick={() => props.playPrevious(props.index)} />}
@@ -86,6 +100,8 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
                     {loop ? <RepeatOneIcon onClick = {desableLoop}  style={{cursor: 'pointer', fontSize: 15}} /> 
                     : <RepeatIcon onClick = {enableLoop} style={{cursor: 'pointer', fontSize: 15}} />}
                </div>
+
+               <div className="file-name-container" title={props.allFileDetail.name}>{props.allFileDetail.name}</div>
                
           </div>
           <audio ref={audioRef} src={props.src} onEnded={() => props.handleOnEnded(props.index)}></audio>

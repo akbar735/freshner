@@ -11,9 +11,8 @@ export default function App(){
     },[])
 
     const getAudioFilesPath = async () => {
-        let path = await windowObj.electronAPI.getAudioFilesPath()
-        path = path.map((url: string) => ({src: url}))
-        setAudioFilesPath(path)
+        let fileDetails = await windowObj.electronAPI.getAudioFilesPath()
+        setAudioFilesPath(fileDetails)
     }
    
     

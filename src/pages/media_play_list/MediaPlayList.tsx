@@ -8,6 +8,7 @@ import './MediaPlayList.css';
 
 export interface IAudioFile{
     src: string;
+    name: string;
 }
 export interface IMediaPlayList{
     audioFiles: IAudioFile[]
@@ -107,10 +108,11 @@ export default function MediaPlayList(props: IMediaPlayList){
         }
     },[currentActiveBar, audioRefs.current, pauseOtherBars])
 
+    console.log("props.audioFiles:::", props.audioFiles)
     return (
         <div>
              <div className='right-align'><SwitchLabels label='Auto Play' checked={autoPlay} handleOnSwitchChange={toggelAutoPlay}/></div>
-            {props.audioFiles.map((IAudioFile, index) =>
+            {props.audioFiles.map((audioFile: IAudioFile, index) =>
                 <AudioBar 
                     startPlaying = {startPlaying}
                     pausePlayin = {pausePlayin}
@@ -122,11 +124,12 @@ export default function MediaPlayList(props: IMediaPlayList){
                     playNext = {playNext}
                     ref={(el: HTMLAudioElement | null) => (audioRefs.current[index] = el)}
                     ownRef ={audioRefs.current[index]}
-                    src={IAudioFile.src}  
-                    key={`${IAudioFile.src}-${index}`} 
+                    src={audioFile.src}  
+                    key={`${audioFile.src}-${index}`} 
                     index = {index}
                     currentActiveBar = {currentActiveBar}
-                    totalBars = {props.audioFiles.length} 
+                    totalBars = {props.audioFiles.length}
+                    allFileDetail= {audioFile} 
                 />
              )
             }

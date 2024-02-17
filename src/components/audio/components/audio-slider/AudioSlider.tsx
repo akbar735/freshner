@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { ChangeEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import './AudioSlider.css';
 interface IAudioSlider{
     totalDuration: number|null;
     currentTime: number|null;
+    updateCurrentTime: ChangeEventHandler<HTMLInputElement>
 }
 
 function getOptimizedEndpoint(rormattedTime: string){
@@ -14,54 +15,7 @@ function getOptimizedEndpoint(rormattedTime: string){
 
 export default function AudioSlider(props: IAudioSlider){
     const pbRef = useRef(null)
-    const [pbWidth, setPbWidth] = useState(0)
-    const [onePixelRateInSec, setOnePixelRateInSec] = useState(0);
-    const [cpbWidth, setCpbWidth] = useState(0);
-
-
-    useEffect(() => {
-        if(props.totalDuration && pbWidth){
-            setOnePixelRateInSec(pbWidth / props.totalDuration);
-        }
-    },[pbWidth, props.totalDuration, setOnePixelRateInSec])
-
-    useEffect(() => {
-        if(props.currentTime) {
-            if(props.currentTime !== props.totalDuration){
-                if(props.currentTime < 0 ) setCpbWidth(0);
-                setCpbWidth(onePixelRateInSec * props.currentTime);
-            }else{
-                setCpbWidth(0);
-            }
-            
-        }else{
-            setCpbWidth(0);
-        }
-    }, [props.currentTime, props.totalDuration, onePixelRateInSec, setCpbWidth])
-
-    const updatePbWidth = useCallback(() =>{
-        const ele = pbRef.current
-        if(ele){
-            const widthInPx: string = window.getComputedStyle(ele).getPropertyValue('width');
-            const width = Number(widthInPx.substring(0, widthInPx.length-2))
-            setPbWidth(width);
-        }
-        
-    }, [pbRef.current, setPbWidth])
-
-    useEffect(() => {
-        if(pbRef.current){
-            updatePbWidth()
-        }
-    }, [pbRef, updatePbWidth])
-
-    useEffect(() => {
-        window.addEventListener('resize', updatePbWidth);
-        return () => {
-            window.removeEventListener('resize', updatePbWidth);
-        }
-    }, [pbRef])
-    
+ 
     const getFirsEndPoint = useMemo(() => {
        
         let timeInSec = props.currentTime ? Math.round(props.currentTime) : 0
@@ -100,11 +54,16 @@ export default function AudioSlider(props: IAudioSlider){
         const endpoint = getOptimizedEndpoint(formattedTime)
         return endpoint
     }, [props.totalDuration, props.currentTime])
-
+   
     return (
-        <div ref = {pbRef} className="progress-bar">
-            <div className="current-progress-bar" style={{width: `${cpbWidth}px`}}></div>
-            <div className="silder-ball" style={{marginLeft: `${cpbWidth}px`}}></div>
+        <div ref = {pbRef} >
+            <input
+                type="range"
+                className="progress-bar"
+                value={props.currentTime as number || 0}
+                max={props.totalDuration as number || 100}
+                onChange={props.updateCurrentTime}
+            />
             <div className="endpoint-container">
                 <div className="time-endpoint">{getFirsEndPoint}</div>
                 <div className="time-endpoint">{getLastEndPoint}</div>

@@ -1,28 +1,31 @@
 .progress-bar{
-    margin: 0 20px;
+    -webkit-appearance: none; /* Hides the default slider appearance in WebKit browsers */
     box-sizing: border-box;
+    display: block;
     height: 1px;
+    width: 100%;
     background-color: #acacac;
-}
-
-
-.current-progress-bar{
-    width: 0px;
-    background-color: white;
-    height: 2px;
-    margin-top: -1px;
-}
-.silder-ball{
-    height: 10px;
-    background-color: white;
-    width: 10px;
-    margin-left: 0px;
-    margin-top: -5px;
-    border-radius: 50%;
-    cursor: pointer;
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Hides the default thumb in WebKit browsers */
+        width: 11px; /* Set the width of the thumb */
+        height: 11px; /* Set the height of the thumb */
+        border-radius: 50%; /* Round the thumb */
+        background: rgb(214, 214, 214); /* Thumb color */
+        cursor: pointer; /* Enable cursor pointer on the thumb */
+    }
+    &:focus {
+        outline: none; /* Removes the default focus styling */
+    }
+    &:hover::-webkit-slider-thumb {
+        background: white; /* Change thumb color on hover in WebKit browsers */
+        outline: 1px solid white;
+    }
+    
 }
 .endpoint-container{
     display: flex;
     justify-content: space-between;
     font-size: 11px;
+    margin-top: 10px;
+    margin-left: 2px;
 }
