@@ -13,7 +13,7 @@ export interface IMediaPlayList{
     audioFiles: IAudioFile[]
 }
 export interface IActiveBarTrack{
-   currentlyPlaying: number 
+   currentlyPlaying: number; 
 }
 
 MediaPlayList.displayName = 'MediaPlayList'
@@ -49,6 +49,11 @@ export default function MediaPlayList(props: IMediaPlayList){
     }, [audioRefs.current, setCurrentActiveBar, currentActiveBar])
 
     const isAudioPlaying = useCallback((barNo: number): boolean => {
+
+        if(audioRefs.current[barNo]?.ended){
+            const audio = audioRefs.current[barNo] as HTMLAudioElement
+            audio.currentTime = 0
+        }
         return !!(audioRefs.current[barNo] && !audioRefs.current[barNo]?.paused && !audioRefs.current[barNo]?.ended);
     }, [audioRefs.current])
     
@@ -57,6 +62,10 @@ export default function MediaPlayList(props: IMediaPlayList){
     }
     
     const handleOnEnded = useCallback((barNo: number) => {
+        if(audioRefs.current[barNo]?.loop){
+            audioRefs.current[barNo]?.play();
+            return 
+        }
         if(autoPlay){
             const nextBar = barNo + 1;
             if(audioRefs.current[nextBar]){
@@ -64,6 +73,39 @@ export default function MediaPlayList(props: IMediaPlayList){
             }
         }   
     }, [autoPlay, audioRefs.current])
+
+    const rewindPlaying = useCallback((barNo: number) =>{
+        if(audioRefs.current && audioRefs.current[barNo]){
+            const audioElem = audioRefs.current[barNo] as HTMLAudioElement;
+            audioElem.currentTime = (audioElem.currentTime ?? 0) - 5;
+        }
+    }, [audioRefs.current]);
+
+    const forwardPlaying = useCallback((barNo: number) =>{
+        if(audioRefs.current && audioRefs.current[barNo]){
+            const audioElem = audioRefs.current[barNo] as HTMLAudioElement;
+            audioElem.currentTime = (audioElem.currentTime ?? 0) + 5;
+        }
+    }, [audioRefs.current]);
+    
+    const playNext = useCallback((barNo: number) => {
+        if(audioRefs.current){
+            pauseOtherBars(barNo + 1);
+            audioRefs.current[barNo + 1]?.play()
+
+            const currentActiveBarTemp = {...currentActiveBar}
+            currentActiveBarTemp.currentlyPlaying = barNo - 1
+        }
+    }, [currentActiveBar, audioRefs.current, pauseOtherBars])
+
+    const playPrevious = useCallback((barNo: number) => {
+        if(audioRefs.current){
+            pauseOtherBars(barNo - 1);
+            audioRefs.current[barNo - 1]?.play()
+            const currentActiveBarTemp = {...currentActiveBar}
+            currentActiveBarTemp.currentlyPlaying = barNo - 1
+        }
+    },[currentActiveBar, audioRefs.current, pauseOtherBars])
 
     return (
         <div>
@@ -74,11 +116,17 @@ export default function MediaPlayList(props: IMediaPlayList){
                     pausePlayin = {pausePlayin}
                     isAudioPlaying = {isAudioPlaying}
                     handleOnEnded = {handleOnEnded}
+                    rewindPlaying ={rewindPlaying}
+                    forwardPlaying = {forwardPlaying}
+                    playPrevious = {playPrevious}
+                    playNext = {playNext}
                     ref={(el: HTMLAudioElement | null) => (audioRefs.current[index] = el)}
                     ownRef ={audioRefs.current[index]}
                     src={IAudioFile.src}  
                     key={`${IAudioFile.src}-${index}`} 
-                    index = {index} 
+                    index = {index}
+                    currentActiveBar = {currentActiveBar}
+                    totalBars = {props.audioFiles.length} 
                 />
              )
             }

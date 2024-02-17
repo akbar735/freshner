@@ -1,18 +1,24 @@
 .audi-bar{
     position: relative;
-    height: 40px;
-    background-color: rgb(255 203 2 / 30%);
+    height: 45px;
+    background-color: #263238;
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 9px;
 }
 
-.center-vertical{
-    position: absolute;
-    top: 50%; 
-    transform: translateY(-50%);
-}
-.m-l-20{
-    margin-left: 20px;
-}
-.play-pause{
+.cursor{
     cursor: pointer;
+}
+.play-controls{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.loop-container{
+    position: absolute;
+    right: 17px;
+    bottom: 0;
 }

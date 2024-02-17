@@ -1,15 +1,28 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import PlayIcon from '../../../assets/svgs/play.svg';
-import PauseIcon from '../../../assets/svgs/pause.svg';
-import './Audio.css'
-import type { IActiveBarTrack } from "../../App";
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import FastForwardIcon from '@mui/icons-material/FastForward';
 import AudioSlider from "./components/audio-slider/AudioSlider";
+import FastRewindIcon from '@mui/icons-material/FastRewind';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import RepeatOneIcon from '@mui/icons-material/RepeatOne';
+import './Audio.css'
+import { IActiveBarTrack } from "../../pages/media_play_list/MediaPlayList";
+
 interface IAudioBar{
     src: string;
     index: number;
+    totalBars: number;
+    currentActiveBar: IActiveBarTrack
     startPlaying: (arg0: number) => void;
     pausePlayin:  (arg0: number) => void;
     handleOnEnded: (arg0: number) => void;
+    rewindPlaying: (arg0: number) => void;
+    forwardPlaying: (arg0: number) => void;
+    playPrevious: (arg0: number) => void;
+    playNext: (arg0: number) => void;
     isAudioPlaying: (arg0: number) => boolean;
     ownRef: HTMLAudioElement | null;
 }
@@ -17,6 +30,7 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
    const [totalDuration, setTotalDuration] = useState<number|null>(null);
    const [currentTime, setCurrentTime] = useState<number|null>(null);
    const audioRef = useRef<HTMLAudioElement>(null);
+   const [loop, setLoop] =  useState(audioRef.current?.loop)
    
    useImperativeHandle(ref, () => {
         return audioRef.current as HTMLAudioElement
@@ -39,13 +53,40 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
         }
    }, [audioRef])
 
+   const desableLoop = useCallback(() => {
+          const audio = audioRef.current as HTMLAudioElement
+          audio.loop = false
+          setLoop(false)
+   }, [audioRef.current])
+
+   const enableLoop = useCallback(() => {
+          const audio = audioRef.current as HTMLAudioElement
+          audio.loop = true
+          setLoop(true)
+   }, [audioRef.current])
+
     return (
      <div> 
           <div className="audi-bar">
-               {props.isAudioPlaying(props.index) ? 
-               <img onClick={() => props.pausePlayin(props.index)} className="center-vertical m-l-20 play-pause" src={PauseIcon} alt="" />
-               : <img onClick={() => props.startPlaying(props.index)} className="center-vertical m-l-20 play-pause" src={PlayIcon} alt="" />}
+               
                <AudioSlider totalDuration= {totalDuration}  currentTime= {currentTime}/>
+               <div className="play-controls">
+                    {props.index === 0 || !props.isAudioPlaying(props.index) ?  <NavigateBeforeIcon style={{color: 'grey'}} /> 
+                    :  <NavigateBeforeIcon style={{cursor: 'pointer'}}  onClick={() => props.playPrevious(props.index)} />}
+                   
+                    <FastRewindIcon style={{cursor: 'pointer'}} onClick={() => props.rewindPlaying(props.index)}/>
+                    {props.isAudioPlaying(props.index) ? 
+                    <PauseCircleOutlineIcon onClick={() => props.pausePlayin(props.index)} style={{cursor: 'pointer'}}  />
+                    : <PlayCircleOutlineIcon onClick={() => props.startPlaying(props.index)} style={{cursor: 'pointer'}} />}
+                    <FastForwardIcon style={{cursor: 'pointer'}} onClick={() => props.forwardPlaying(props.index)} />
+                    {props.index === props.totalBars - 1 || !props.isAudioPlaying(props.index) ?  <NavigateNextIcon style={{color: 'grey'}} /> 
+                    :  <NavigateNextIcon style={{cursor: 'pointer'}} onClick={() => props.playNext(props.index)} />}
+               </div>
+               <div className="loop-container">
+                    {loop ? <RepeatOneIcon onClick = {desableLoop}  style={{cursor: 'pointer', fontSize: 15}} /> 
+                    : <RepeatIcon onClick = {enableLoop} style={{cursor: 'pointer', fontSize: 15}} />}
+               </div>
+               
           </div>
           <audio ref={audioRef} src={props.src} onEnded={() => props.handleOnEnded(props.index)}></audio>
      </div>
