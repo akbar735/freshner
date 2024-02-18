@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 // Define a type for the slice state
-interface CounterState {
+interface AudioState {
     autoPlay: boolean
 }
 
 // Define the initial state using that type
-const initialState: CounterState = {
+const initialState: AudioState = {
   autoPlay: false,
 }
 

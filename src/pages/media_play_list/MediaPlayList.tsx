@@ -5,13 +5,15 @@ import { useAppDispatch } from '../../hooks';
 import SwitchLabels from '../../widgets/switch/Switch';
 import { autoPlayToggled } from '../../slices/AudioSlice';
 import './MediaPlayList.css';
+import { Button } from '@mui/material';
 
 export interface IAudioFile{
     src: string;
     name: string;
 }
 export interface IMediaPlayList{
-    audioFiles: IAudioFile[]
+    audioFiles: IAudioFile[],
+    selectedMedia: FileList|null
 }
 export interface IActiveBarTrack{
    currentlyPlaying: number; 
@@ -108,31 +110,41 @@ export default function MediaPlayList(props: IMediaPlayList){
         }
     },[currentActiveBar, audioRefs.current, pauseOtherBars])
 
-    console.log("props.audioFiles:::", props.audioFiles)
+    const createAlbum = () => {
+            console.log("props.selectedMedia", props.selectedMedia)
+    }
+
     return (
         <div>
              <div className='right-align'><SwitchLabels label='Auto Play' checked={autoPlay} handleOnSwitchChange={toggelAutoPlay}/></div>
-            {props.audioFiles.map((audioFile: IAudioFile, index) =>
-                <AudioBar 
-                    startPlaying = {startPlaying}
-                    pausePlayin = {pausePlayin}
-                    isAudioPlaying = {isAudioPlaying}
-                    handleOnEnded = {handleOnEnded}
-                    rewindPlaying ={rewindPlaying}
-                    forwardPlaying = {forwardPlaying}
-                    playPrevious = {playPrevious}
-                    playNext = {playNext}
-                    ref={(el: HTMLAudioElement | null) => (audioRefs.current[index] = el)}
-                    ownRef ={audioRefs.current[index]}
-                    src={audioFile.src}  
-                    key={`${audioFile.src}-${index}`} 
-                    index = {index}
-                    currentActiveBar = {currentActiveBar}
-                    totalBars = {props.audioFiles.length}
-                    allFileDetail= {audioFile} 
-                />
-             )
-            }
+             <div className='play-list'>
+                {props.audioFiles.map((audioFile: IAudioFile, index) =>
+                    <AudioBar 
+                        startPlaying = {startPlaying}
+                        pausePlayin = {pausePlayin}
+                        isAudioPlaying = {isAudioPlaying}
+                        handleOnEnded = {handleOnEnded}
+                        rewindPlaying ={rewindPlaying}
+                        forwardPlaying = {forwardPlaying}
+                        playPrevious = {playPrevious}
+                        playNext = {playNext}
+                        ref={(el: HTMLAudioElement | null) => (audioRefs.current[index] = el)}
+                        ownRef ={audioRefs.current[index]}
+                        src={audioFile.src}  
+                        key={`${audioFile.src}-${index}`} 
+                        index = {index}
+                        currentActiveBar = {currentActiveBar}
+                        totalBars = {props.audioFiles.length}
+                        allFileDetail= {audioFile} 
+                    />
+                    )
+                }
+            </div>
+            <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: 10}}>
+                <Button onClick={createAlbum} variant='contained' size='small'>Create Album</Button>
+            </div>
+           
+            
         </div>
     )
 }

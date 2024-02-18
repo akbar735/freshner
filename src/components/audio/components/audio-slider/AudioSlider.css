@@ -2,7 +2,7 @@
     -webkit-appearance: none; /* Hides the default slider appearance in WebKit browsers */
     box-sizing: border-box;
     display: block;
-    height: 1px;
+    height: 2px;
     width: 100%;
     background-color: #acacac;
     &::-webkit-slider-thumb {
@@ -17,8 +17,8 @@
         outline: none; /* Removes the default focus styling */
     }
     &:hover::-webkit-slider-thumb {
-        background: white; /* Change thumb color on hover in WebKit browsers */
-        outline: 1px solid white;
+        background: rgb(50, 50, 50); /* Change thumb color on hover in WebKit browsers */
+        outline: 1px solid rgb(50, 50, 50);
     }
     
 }

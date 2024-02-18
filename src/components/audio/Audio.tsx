@@ -100,8 +100,12 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
                     {loop ? <RepeatOneIcon onClick = {desableLoop}  style={{cursor: 'pointer', fontSize: 15}} /> 
                     : <RepeatIcon onClick = {enableLoop} style={{cursor: 'pointer', fontSize: 15}} />}
                </div>
-
-               <div className="file-name-container" title={props.allFileDetail.name}>{props.allFileDetail.name}</div>
+               <div className="file-name-container" title={props.allFileDetail.name}>
+                    <div className={props.isAudioPlaying(props.index) ? "marquee-content": ''}>
+                         {props.allFileDetail.name}
+                    </div>
+                    
+               </div>
                
           </div>
           <audio ref={audioRef} src={props.src} onEnded={() => props.handleOnEnded(props.index)}></audio>
