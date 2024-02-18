@@ -16,26 +16,28 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-const windowObj = window as typeof window & {electronAPI: { getAudioFilesPath: Function}};
+const windowObj = window as typeof window & {
+    electronAPI: { 
+        getAudioFilesPath: () => IAudioFile[],
+    }
+};
+interface  IFile extends File{
+    path: string;
+}
 export default function App(){
     const [audioFilesPath, setAudioFilesPath] = useState<IAudioFile[]>([])
     const [selectedMedia, setSelectedMedia] = useState<FileList|null>(null)
 
-    // useEffect(() => {
-    //    getAudioFilesPath()
-    // },[])
-
     useEffect(() => {
         if(selectedMedia){
-            const formatted = Array.from(selectedMedia).map((file: File) => {
+            const formatted = Array.from(selectedMedia).map((file: any) => {
                 return {
                     name: file.name,
-                    src: URL.createObjectURL(file)
+                    src: file.path
                 }
             })
             setAudioFilesPath(formatted)
         }
-      
     },[selectedMedia])
     const getAudioFilesPath = async () => {
         let fileDetails = await windowObj.electronAPI.getAudioFilesPath()

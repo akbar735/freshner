@@ -6,6 +6,7 @@ import SwitchLabels from '../../widgets/switch/Switch';
 import { autoPlayToggled } from '../../slices/AudioSlice';
 import './MediaPlayList.css';
 import { Button } from '@mui/material';
+import AlbumInputDialog from '../../widgets/dialog/AlbumInputDialog';
 
 export interface IAudioFile{
     src: string;
@@ -18,14 +19,19 @@ export interface IMediaPlayList{
 export interface IActiveBarTrack{
    currentlyPlaying: number; 
 }
-
+const windowObj = window as typeof window & {
+    electronAPI: { 
+        handleCreateAlbum: (arg0: string, arg1: IAudioFile[]) => void,
+    }
+};
 MediaPlayList.displayName = 'MediaPlayList'
 export default function MediaPlayList(props: IMediaPlayList){
     const [currentActiveBar, setCurrentActiveBar] = useState<IActiveBarTrack>({currentlyPlaying: -1})
     const autoPlay = useAppSelector(state => state.audio.autoPlay)
     const dispatch = useAppDispatch()
     const audioRefs = useRef<(HTMLAudioElement | null)[]>(props.audioFiles.map(() => null));
-   
+    const [isAlbumPopupOpen, setIsAlbumPopupOpen] = useState(false);
+    
     const pauseOtherBars = (excludBarNo: number) => {
         
         if(audioRefs.current.length > 0){
@@ -112,8 +118,19 @@ export default function MediaPlayList(props: IMediaPlayList){
 
     const createAlbum = () => {
             console.log("props.selectedMedia", props.selectedMedia)
+        setIsAlbumPopupOpen(true)
     }
 
+    const handleOnClose = () => {
+        setIsAlbumPopupOpen(false)
+    }
+    const handleOnSave = useCallback(async (name: string) => {
+        setIsAlbumPopupOpen(false)
+        console.log("name::", name)
+       
+        const msg = await windowObj.electronAPI.handleCreateAlbum(name, props.audioFiles)
+        console.log("msg:::", msg)
+    }, [props.audioFiles]) 
     return (
         <div>
              <div className='right-align'><SwitchLabels label='Auto Play' checked={autoPlay} handleOnSwitchChange={toggelAutoPlay}/></div>
@@ -143,8 +160,11 @@ export default function MediaPlayList(props: IMediaPlayList){
             <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: 10}}>
                 <Button onClick={createAlbum} variant='contained' size='small'>Create Album</Button>
             </div>
-           
-            
+            <AlbumInputDialog
+                open = {isAlbumPopupOpen}
+                onClose={handleOnClose}
+                onSave={handleOnSave}
+            />
         </div>
     )
 }

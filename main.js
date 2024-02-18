@@ -1,13 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('node:path')
 const { handleGetAudioFilesPath } = require('./ipchandler/render.event.handler')
-
+const { handleCreateAlbum } = require('./ipchandler/createAlbum')
+let win
 const createWindow = () => {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 400,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
     }
   })
 
@@ -21,5 +22,7 @@ require('electron-reload')(__dirname, {
 })
 app.whenReady().then(() => {
   ipcMain.handle('file:getAudioFilesPath', handleGetAudioFilesPath)
+  ipcMain.handle('file:createAlbum', handleCreateAlbum)
+
   createWindow()
 })
