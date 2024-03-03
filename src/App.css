@@ -1,37 +1,16 @@
-body{
-    margin: 0;
-    padding: 0;
-}
-.container{
-  margin-bottom: 10px;
-}
-audio {
-    width: 100%;
-    margin: 0 auto;
-}
-.open-area{
-  height: calc(100vh - 41px);
-  display: flex;
-  justify-content: center;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .sidebar-height {
+      height: calc(100vh - 130px);
+    }
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 5px;
-  }
+#app-header {
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+}
   
-  /* Track */
-  ::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey; 
-    border-radius: 5px;
-  }
-   
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #575656; 
-  }

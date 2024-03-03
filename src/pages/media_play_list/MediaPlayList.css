@@ -3,9 +3,7 @@
     justify-content: end;
 }
 .play-list{
-   display: flex;
-   justify-content: center;
-   flex-direction: column;
-   margin: 0 10px;
-   margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }

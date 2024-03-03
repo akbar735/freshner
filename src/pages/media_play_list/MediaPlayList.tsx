@@ -5,16 +5,34 @@ import { useAppDispatch } from '../../hooks';
 import SwitchLabels from '../../widgets/switch/Switch';
 import { autoPlayToggled } from '../../slices/AudioSlice';
 import './MediaPlayList.css';
-import { Button } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import AlbumInputDialog from '../../widgets/dialog/AlbumInputDialog';
+import AudioPlayer from '../../widgets/audio/AudioPlayer';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import RepeatOnIcon from '@mui/icons-material/RepeatOn';
+import { useTheme } from '@mui/material/styles';
+import { loopPlayListToggled } from '../../slices/AudioSlice';
+
+export interface IMetaData{
+    album: string;
+    title: string;
+    artist: string;
+    picture: {
+        format: string;
+        type: string;
+        description: string;
+        base64Image: string;
+    }
+};
 
 export interface IAudioFile{
     src: string;
     name: string;
+    metadata?: IMetaData;
 }
 export interface IMediaPlayList{
-    audioFiles: IAudioFile[],
-    selectedMedia: FileList|null
+    audioFiles: IAudioFile[];
+    playListName: string;
 }
 export interface IActiveBarTrack{
    currentlyPlaying: number; 
@@ -28,10 +46,12 @@ MediaPlayList.displayName = 'MediaPlayList'
 export default function MediaPlayList(props: IMediaPlayList){
     const [currentActiveBar, setCurrentActiveBar] = useState<IActiveBarTrack>({currentlyPlaying: -1})
     const autoPlay = useAppSelector(state => state.audio.autoPlay)
+    const playListLoop = useAppSelector(state => state.audio.playListLoop)
     const dispatch = useAppDispatch()
     const audioRefs = useRef<(HTMLAudioElement | null)[]>(props.audioFiles.map(() => null));
     const [isAlbumPopupOpen, setIsAlbumPopupOpen] = useState(false);
-    
+    const theme = useTheme();
+    const mainIconColor = theme.palette.mode === 'dark' ? '#fff' : '#000';
     const pauseOtherBars = (excludBarNo: number) => {
         
         if(audioRefs.current.length > 0){
@@ -80,6 +100,11 @@ export default function MediaPlayList(props: IMediaPlayList){
             if(audioRefs.current[nextBar]){
                 audioRefs.current[nextBar]?.play();
             }
+            if(playListLoop){
+                if(props.audioFiles.length -1 === barNo){
+                    audioRefs.current[0]?.play();
+                }
+            }
         }   
     }, [autoPlay, audioRefs.current])
 
@@ -117,7 +142,6 @@ export default function MediaPlayList(props: IMediaPlayList){
     },[currentActiveBar, audioRefs.current, pauseOtherBars])
 
     const createAlbum = () => {
-            console.log("props.selectedMedia", props.selectedMedia)
         setIsAlbumPopupOpen(true)
     }
 
@@ -131,11 +155,23 @@ export default function MediaPlayList(props: IMediaPlayList){
         const msg = await windowObj.electronAPI.handleCreateAlbum(name, props.audioFiles)
         console.log("msg:::", msg)
     }, [props.audioFiles]) 
+
+    const togglePlayListLoop = () => {
+        dispatch(loopPlayListToggled())
+    }
+
     return (
         <div>
-             <div className='right-align'><SwitchLabels label='Auto Play' checked={autoPlay} handleOnSwitchChange={toggelAutoPlay}/></div>
+             <div className='right-align'>
+                <IconButton sx={{marginRight: '20px'}} aria-label="next song" onClick={togglePlayListLoop}>
+                    {!playListLoop && <RepeatIcon htmlColor={mainIconColor} />}
+                    {playListLoop && <RepeatOnIcon htmlColor={mainIconColor} />}
+                </IconButton>
+                <SwitchLabels label='Auto Play' checked={autoPlay} handleOnSwitchChange={toggelAutoPlay}/>
+            </div>
              <div className='play-list'>
                 {props.audioFiles.map((audioFile: IAudioFile, index) =>
+                    // <AudioPlayer />
                     <AudioBar 
                         startPlaying = {startPlaying}
                         pausePlayin = {pausePlayin}
@@ -146,7 +182,6 @@ export default function MediaPlayList(props: IMediaPlayList){
                         playPrevious = {playPrevious}
                         playNext = {playNext}
                         ref={(el: HTMLAudioElement | null) => (audioRefs.current[index] = el)}
-                        ownRef ={audioRefs.current[index]}
                         src={audioFile.src}  
                         key={`${audioFile.src}-${index}`} 
                         index = {index}
@@ -158,7 +193,8 @@ export default function MediaPlayList(props: IMediaPlayList){
                 }
             </div>
             <div style={{display: 'flex', justifyContent: 'flex-end', marginRight: 10}}>
-                <Button onClick={createAlbum} variant='contained' size='small'>Create Album</Button>
+                {!props.playListName && <Button onClick={createAlbum} variant='contained' size='small'>Create Album</Button>}
+                {!!props.playListName && <Button  variant='contained' size='small'>Add Song</Button>}
             </div>
             <AlbumInputDialog
                 open = {isAlbumPopupOpen}

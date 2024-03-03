@@ -1,78 +1,19 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import MediaPlayList, { type IAudioFile } from './pages/media_play_list/MediaPlayList';
-import './App.css';
-import AppDrawer from './widgets/drawer/AppDrawer';
-import { Button, styled } from '@mui/material';
+import React from "react";
+import { HashRouter, Routes, Route, Outlet, Link } from "react-router-dom";
+import Layout from "./Layout";
+import Home from "./pages/Home";
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
-
-const windowObj = window as typeof window & {
-    electronAPI: { 
-        getAudioFilesPath: () => IAudioFile[],
-    }
-};
-interface  IFile extends File{
-    path: string;
-}
+App.displayName = 'App';
 export default function App(){
-    const [audioFilesPath, setAudioFilesPath] = useState<IAudioFile[]>([])
-    const [selectedMedia, setSelectedMedia] = useState<FileList|null>(null)
-
-    useEffect(() => {
-        if(selectedMedia){
-            const formatted = Array.from(selectedMedia).map((file: any) => {
-                return {
-                    name: file.name,
-                    src: file.path
-                }
-            })
-            setAudioFilesPath(formatted)
-        }
-    },[selectedMedia])
-    const getAudioFilesPath = async () => {
-        let fileDetails = await windowObj.electronAPI.getAudioFilesPath()
-        setAudioFilesPath(fileDetails)
-    }
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files
-        console.log("files:::", files)
-        setSelectedMedia(files)
-    }
-   
     return (
-        <div className='container'>
-           <AppDrawer />
-           {audioFilesPath.length ===0 && <div className='open-area'>
-                <Button
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    style={{alignSelf: 'center'}}
-                    size='small'
-                    tabIndex={-1}
-                >
-                    Open Media
-                    <VisuallyHiddenInput 
-                        multiple 
-                        type="file" 
-                        accept="audio/*,video/*" 
-                        onChange={handleFileChange}
-                    />
-                </Button>
-           </div>}
-            {audioFilesPath.length > 0 && 
-                <MediaPlayList audioFiles= {audioFilesPath} selectedMedia={selectedMedia}/> 
-            }
+        <div className="bg-slate-100 dark:bg-gray-950 dark:text-white h-screen">
+            <HashRouter>
+                <Routes>
+                    <Route path="/" element={<Layout />}>
+                        <Route index element={<Home />} />
+                    </Route>
+                </Routes>
+            </HashRouter>
         </div>
     )
 }

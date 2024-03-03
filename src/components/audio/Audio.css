@@ -55,6 +55,9 @@
     display: inline-block;
     animation: marquee-scroll 15s linear infinite;
 }
+.audio-widget{
+    margin: 20px;
+}
 
 @keyframes marquee-scroll {
     from {

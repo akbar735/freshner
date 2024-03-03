@@ -9,7 +9,8 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import RepeatOneIcon from '@mui/icons-material/RepeatOne';
 import './Audio.css'
-import { IActiveBarTrack } from "../../pages/media_play_list/MediaPlayList";
+import { IActiveBarTrack, IMetaData } from "../../pages/media_play_list/MediaPlayList";
+import AudioPlayer from "../../widgets/audio/AudioPlayer";
 
 interface IAudioBar{
     src: string;
@@ -24,17 +25,17 @@ interface IAudioBar{
     playPrevious: (arg0: number) => void;
     playNext: (arg0: number) => void;
     isAudioPlaying: (arg0: number) => boolean;
-    ownRef: HTMLAudioElement | null;
     allFileDetail: {
           name: string;
           src: string;
+          metadata?: IMetaData;
     }
 }
 const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudioBar, ref){
    const [totalDuration, setTotalDuration] = useState<number|null>(null);
    const [currentTime, setCurrentTime] = useState<number|null>(null);
    const audioRef = useRef<HTMLAudioElement>(null);
-   const [loop, setLoop] =  useState(audioRef.current?.loop)
+   const [loop, setLoop] =  useState(audioRef.current?.loop || false)
    
    useImperativeHandle(ref, () => {
         return audioRef.current as HTMLAudioElement
@@ -49,7 +50,7 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
         const duration: number = (event.target as HTMLMediaElement).duration;
         setTotalDuration(duration);
    }
-   console.log("allFileDetail:::", props.allFileDetail)
+  
    useEffect(() => {
         audioRef.current?.addEventListener('timeupdate',handleAudioTimeUpdate);
         audioRef.current?.addEventListener('loadedmetadata',handleLoadedMetaData);
@@ -70,44 +71,39 @@ const AudioBar =  forwardRef<HTMLAudioElement, IAudioBar>(function (props: IAudi
           setLoop(true)
    }, [audioRef.current])
 
-   const updateCurrentTime = (event: ChangeEvent<HTMLInputElement>) => {
+   const updateCurrentTime = (value: number) => {
      const audio = audioRef.current;
-     const newTime = parseFloat(event.target.value);
+     const newTime = value
  
      if (audio) {
        audio.currentTime = newTime;
        setCurrentTime(newTime);
      }
-   }
+   } 
+   
+   console.log("props.allFileDetail:::",props.allFileDetail)
     return (
-     <div> 
-          <div className="audi-bar">
-               {/* <div>{props.allFileDetail.name}</div> */}
-               <AudioSlider totalDuration= {totalDuration} updateCurrentTime = {updateCurrentTime}  currentTime= {currentTime}/>
-               <div className="play-controls">
-                    {props.index === 0 || !props.isAudioPlaying(props.index) ?  <NavigateBeforeIcon style={{color: 'grey'}} /> 
-                    :  <NavigateBeforeIcon style={{cursor: 'pointer'}}  onClick={() => props.playPrevious(props.index)} />}
-                   
-                    <FastRewindIcon style={{cursor: 'pointer'}} onClick={() => props.rewindPlaying(props.index)}/>
-                    {props.isAudioPlaying(props.index) ? 
-                    <PauseCircleOutlineIcon onClick={() => props.pausePlayin(props.index)} style={{cursor: 'pointer'}}  />
-                    : <PlayCircleOutlineIcon onClick={() => props.startPlaying(props.index)} style={{cursor: 'pointer'}} />}
-                    <FastForwardIcon style={{cursor: 'pointer'}} onClick={() => props.forwardPlaying(props.index)} />
-                    {props.index === props.totalBars - 1 || !props.isAudioPlaying(props.index) ?  <NavigateNextIcon style={{color: 'grey'}} /> 
-                    :  <NavigateNextIcon style={{cursor: 'pointer'}} onClick={() => props.playNext(props.index)} />}
-               </div>
-               <div className="loop-container">
-                    {loop ? <RepeatOneIcon onClick = {desableLoop}  style={{cursor: 'pointer', fontSize: 15}} /> 
-                    : <RepeatIcon onClick = {enableLoop} style={{cursor: 'pointer', fontSize: 15}} />}
-               </div>
-               <div className="file-name-container" title={props.allFileDetail.name}>
-                    <div className={props.isAudioPlaying(props.index) ? "marquee-content": ''}>
-                         {props.allFileDetail.name}
-                    </div>
-                    
-               </div>
-               
+     <div className="audio-widget"> 
+          <div style={{marginBottom: 10}}>
+               <AudioPlayer  
+                    totalDuration= {totalDuration} 
+                    updateCurrentTime = {updateCurrentTime}  
+                    currentTime= {currentTime}
+                    paused = {!props.isAudioPlaying(props.index)}
+                    startPlaying = {props.startPlaying}
+                    pausePlaying = {props.pausePlayin}
+                    rewindPlaying = {props.rewindPlaying}
+                    forwardPlaying = {props.forwardPlaying}
+                    playPrevious = {props.playPrevious}
+                    playNext = {props.playNext}
+                    index = {props.index}
+                    allFileDetail = {props.allFileDetail}
+                    enableLoop = {enableLoop}
+                    desableLoop = {desableLoop}
+                    loop = {loop}
+               />
           </div>
+          
           <audio ref={audioRef} src={props.src} onEnded={() => props.handleOnEnded(props.index)}></audio>
      </div>
     ) 

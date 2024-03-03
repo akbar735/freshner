@@ -15,8 +15,15 @@ import { IconButton } from '@mui/material';
 import './AppDrawer.css';
 
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
-
-export default function AppDrawer() {
+export interface IListItems{
+  name: string, 
+  path?: string
+}
+export interface IAppDrawer{
+  listItems: IListItems[];
+  onClickListItem: (arg0: string|undefined, arg1: string) => void;
+}
+export default function AppDrawer(props: IAppDrawer) {
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -46,30 +53,18 @@ export default function AppDrawer() {
       onKeyDown={toggleDrawer(anchor, false)}
     >
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
+        {props.listItems.map((item, index: number) => (
+          <ListItem key={item.name} disablePadding onClick={() => props.onClickListItem(item.path, item.name)}>
             <ListItemButton>
               <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
-              <ListItemText primary={text} />
+              <ListItemText primary={item.name} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
       <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
     </Box>
   );
 
