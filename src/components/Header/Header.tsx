@@ -28,13 +28,13 @@ export default function Header(){
     }
 
     return (
-        <div className="bg-slate-200 p-1.5 dark:bg-black flex justify-between">
+        <div className="bg-slate-200 p-1.5 dark:bg-black flex justify-between border-b border-slate-300">
             <div className="flex items-center">
                 <IconButton>
                     <ArrowLeftIcon className="h-5 w-5"/>
                 </IconButton>
             </div>
-            <div id="app-header" className="size-full h-auto"> fdgdfgs</div>
+            <div id="app-header" className="size-full h-auto"></div>
             <div className="flex items-center">
                 <IconButton onCLick={miniMizeWindow}>
                     <MdMinimize className="h-5 w-5"/>

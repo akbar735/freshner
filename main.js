@@ -8,8 +8,8 @@ const { handleGetAllPlayList } = require('./ipchandler/getPlayList')
 let win
 const createWindow = () => {
   win = new BrowserWindow({
-    width: 700,
-    height: 800,
+    width: 1000,
+    height: 850,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },

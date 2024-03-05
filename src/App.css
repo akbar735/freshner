@@ -4,7 +4,13 @@
 
 @layer utilities {
     .sidebar-height {
-      height: calc(100vh - 130px);
+      height: calc(100vh - 150px);
+    }
+    .w-200{
+      width: 200px;
+    }
+    .h-89{
+      height: 89px;
     }
 }
 
@@ -14,3 +20,6 @@
     user-select: none;
 }
   
+body {
+  font-family: 'Roboto', sans-serif;
+}
