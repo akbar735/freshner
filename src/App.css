@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer utilities {
-    .sidebar-height {
+    .app-content-height {
       height: calc(100vh - 150px);
     }
     .w-200{
@@ -11,6 +11,9 @@
     }
     .h-89{
       height: 89px;
+    }
+    .text-xsm{
+      font-size: 11px;
     }
 }
 

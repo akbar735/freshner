@@ -35,7 +35,7 @@ const settingPage = [
 export default function SideBar(){
  
     return (
-        <div className="border-r border-slate-300 sidebar-height">
+        <div className="border-r border-slate-300 app-content-height">
             <div className="flex justify-between flex-col h-full w-200">
                 <ul>
                     {pageLink.map(page => (

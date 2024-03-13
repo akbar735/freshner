@@ -15,6 +15,33 @@ const getMetaData = (url) => {
           });
     })
 }
+
+const handleGetFileMetaData = async (_event, url) => {
+    const metadata = await getMetaData(url);
+
+    let base64String = ''
+    if (metadata?.tags?.picture?.data) {
+        const dataArray = metadata.tags.picture.data;
+        let charArray = [];
+        for (let i = 0; i < dataArray.length; i++) {
+          charArray.push(String.fromCharCode(dataArray[i]));
+        }
+        base64String = btoa(charArray.join(''));
+    }
+
+    return {
+        album: metadata?.tags?.album,
+        picture: {
+            format: metadata?.tags?.picture?.format,
+            description: metadata?.tags?.picture?.description,
+            type: metadata?.tags?.picture?.type,
+            base64Image: `data:${metadata?.tags?.picture?.format};base64,${base64String}`
+        },
+        artist: metadata?.tags?.artist,
+        title: metadata?.tags?.title
+    }
+
+}
 const handleGetAudioFilesPath = async (_event, albumPath) => {
     const audioFiles = await fs.promises.readdir(albumPath)
     const audioFilesWithMetaData = []
@@ -52,5 +79,6 @@ const handleGetAudioFilesPath = async (_event, albumPath) => {
 }
 
 module.exports ={
-    handleGetAudioFilesPath
+    handleGetAudioFilesPath,
+    handleGetFileMetaData
 }
