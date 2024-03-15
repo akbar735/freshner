@@ -63,7 +63,7 @@ export default function Button(props: IButton) {
       {props.label}
       {props.iconOrientation === Orientation.RIGHT && props.icon && <props.icon className="text-lg" />}
       {(
-        <div ref={popOver} className={`absolute shadow-lg bg-slate-100 dark:bg-gray-950 shadow-slate-500/50 dark:text-white top-9 right-0 w-max ${!isPopoverOpen ? 'hidden': ''}`}>
+        <div ref={popOver} className={`z-50 absolute shadow-lg bg-slate-100 dark:bg-gray-950 shadow-slate-500/50 dark:text-white top-9 right-0 w-max ${!isPopoverOpen ? 'hidden': ''}`}>
           {props.dropdownButtons?.map((btn, index) => (
             <>
               <label htmlFor={`fileInpit-${index}-${fileInputId}`} key={btn.label} className="p-2 flex items-center hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer">

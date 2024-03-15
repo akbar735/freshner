@@ -49,8 +49,8 @@ export default function Home(){
 
     console.log("files:::", files)
     return (
-        <div className="w-full p-2 app-content-height overflow-auto">
-            <div className="flex justify-end"> 
+        <div className="app-content-height overflow-auto w-full p-2">
+            <div className="flex justify-end mb-2"> 
                 <FileOpenerPopOverBtn 
                     label="OPEN MEDIA" 
                     onClick={handleOnClick}
@@ -59,17 +59,20 @@ export default function Home(){
                     dropdownButtons={allFileOpenOption}
                 />
             </div>
-            <div>
-                {files.map((file: File) => {
-                    if(getFileType(file.type) === 'audio'){
-                        return <AudioWrapper file = {file}/>
-                    }else if(getFileType(file.type) === 'video'){
-                        return <VideoWrapper file = {file} />
-                    }else{
-                        return <UnsupportedWrapper />
-                    }
-                })}
+            <div className="media-container-height overflow-auto">
+                <div className="grid media-wrppaer-width gap-4 ">
+                    {files.map((file: File) => {
+                        if(getFileType(file.type) === 'audio'){
+                            return <AudioWrapper file = {file}/>
+                        }else if(getFileType(file.type) === 'video'){
+                            return <VideoWrapper file = {file} />
+                        }else{
+                            return <UnsupportedWrapper />
+                        }
+                    })}
+                </div>
             </div>
+            
         </div>
     )
 }

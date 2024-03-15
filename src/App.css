@@ -6,6 +6,18 @@
     .app-content-height {
       height: calc(100vh - 150px);
     }
+    .media-container-height{
+      height: calc(100vh - 204px);
+    }
+    .media-tranparency{
+      background-color: #00000082;
+    }
+    .media-title-width{
+      width: calc(100% - 20px);
+    }
+    .media-controls-height{
+      height: calc(100% - 20px)
+    }
     .w-200{
       width: 200px;
     }
@@ -14,6 +26,9 @@
     }
     .text-xsm{
       font-size: 11px;
+    }
+    .media-wrppaer-width{
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     }
 }
 
