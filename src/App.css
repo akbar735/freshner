@@ -18,6 +18,10 @@
     .media-controls-height{
       height: calc(100% - 20px)
     }
+    .track-media-title-size{
+      height: 52px;
+      width: 85px;
+    }
     .w-200{
       width: 200px;
     }

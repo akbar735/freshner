@@ -1,11 +1,8 @@
-.parent {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    grid-gap: 10px; /* Adjust the gap between items as needed */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
   }
-  
-  .child {
-    width: 100%; /* Ensure each child div takes up the full width of its grid cell */
-    height: 200px;
-    /* Additional styling for the child divs */
+  100% {
+    transform: translateX(-100%);
   }
+}

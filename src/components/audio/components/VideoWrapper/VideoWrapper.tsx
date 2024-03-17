@@ -1,7 +1,8 @@
 import React from "react";
+import { IFileDetail } from "../../../../types";
 
 export interface IVideoWrapper{
-    file: File
+    fileDetail: IFileDetail
 }
 
 VideoWrapper.displayName = 'VideoWrapper';

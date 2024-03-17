@@ -27,6 +27,9 @@ export default function Button(props: IButton) {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const popOver = useRef<HTMLDivElement>(null);
   const mainBtn = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputFolderRef = useRef<HTMLInputElement>(null);
+
   const fileInputId = useId();
   const handleClickAway = (event: MouseEvent) => {
     if (mainBtn.current && !mainBtn.current.contains(event.target as Node)) {
@@ -54,7 +57,12 @@ export default function Button(props: IButton) {
 
   const handleFileChange =  (files: FileList | null, onFilesSlected: (arg0: FileList | null) => void) => {
     setIsPopoverOpen(false);
-    onFilesSlected(files)
+    onFilesSlected(files);
+    if(inputRef.current && inputFolderRef.current){
+      inputRef.current.value = '';
+      inputFolderRef.current.value = '';
+    }
+    
   };
 
   return (
@@ -74,7 +82,8 @@ export default function Button(props: IButton) {
                     </div>
                 </label>
                 {btn.onlyFolder ? <input 
-                  id={`fileInpit-${index}-${fileInputId}`}  
+                  id={`fileInpit-${index}-${fileInputId}`} 
+                  ref = {inputFolderRef} 
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-ignore
                   webkitdirectory = {"true"}
@@ -86,6 +95,7 @@ export default function Button(props: IButton) {
                  <input 
                   id={`fileInpit-${index}-${fileInputId}`}  
                   type="file" 
+                  ref={inputRef}
                   multiple
                   accept={btn.accpet} className="hidden"  
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e.target.files, btn.onFilesSlected)} 
