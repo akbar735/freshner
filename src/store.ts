@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import audioReducer from './slices/AudioSlice';
 import mediaReducer from './slices/MediaSclice'
 // ...
 
 export const store = configureStore({
   reducer: {
-    audio: audioReducer,
     media: mediaReducer
   },
 })
