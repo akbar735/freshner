@@ -49,8 +49,50 @@
         opacity: 0.3;
         cursor: not-allowed;
     }
-  
-  @media (prefers-color-scheme: dark){
+
+/* hide controls on fullscreen with WebKit */
+figure video::-webkit-media-controls {
+	display:none !important;
+}
+figure {
+	max-width:100%;
+	width:100%;
+	margin:0;
+	padding:0;
+	max-height:100%;
+}
+figure[data-fullscreen=true] video {
+	height:auto;
+}
+figure[data-fullscreen=true] figcaption {
+	display:none;
+}
+figure[data-fullscreen=true] .controls {
+	position:absolute;
+	bottom:0;
+	width:100%;
+	z-index:2147483647;
+}
+figure[data-fullscreen=true] .controls li {
+	width:5%;
+}
+figure[data-fullscreen=true] .controls .progress {
+	width:68%;
+}
+
+.brogress-bar-snap::-webkit-slider-runnable-track {
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity));
+}
+.brogress-bar-snap::-webkit-slider-thumb {
+   background-color: rgb(203 213 225 / var(--tw-border-opacity));
+}
+.brogress-bar-snap:hover::-webkit-slider-thumb {   
+  border: 0.5px solid rgb(203 213 225 / var(--tw-border-opacity));
+  outline: 2px solid rgb(203 213 225 / var(--tw-border-opacity));
+}
+
+
+@media (prefers-color-scheme: dark){
     .brogress-bar::-webkit-slider-runnable-track {
       background-color: rgb(51 65 85 / var(--tw-bg-opacity));
     }
@@ -61,4 +103,4 @@
       border: 0.5px solid rgb(203 213 225 / var(--tw-border-opacity));
       outline: 2px solid rgb(203 213 225 / var(--tw-border-opacity));
     }
-  }
+}

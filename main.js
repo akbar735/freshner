@@ -12,6 +12,7 @@ const createWindow = () => {
     height: 850,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      hardwareAcceleration: true
     },
     frame: false
   })

@@ -1,9 +1,0 @@
-.right-align{
-    display: flex;
-    justify-content: end;
-}
-.play-list{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}

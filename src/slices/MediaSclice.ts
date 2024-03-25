@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
-import { IListItems } from '../widgets/drawer/AppDrawer'
 import { IFileDetail } from '../types';
 // Define a type for the slice state
 interface MediaState {
@@ -23,6 +22,7 @@ interface MediaState {
         location: string;
         media: IFileDetail | null;
         isPlaying: boolean;
+        isPlaybackOpen: boolean;
     },
     [index: string]: any;
 }
@@ -47,7 +47,8 @@ const initialState: MediaState = {
     currentlyOnTrack: {
         location: '',
         media: null,
-        isPlaying: false
+        isPlaying: false,
+        isPlaybackOpen: false
     }
 }
 
@@ -91,6 +92,9 @@ export const mediaSlice = createSlice({
     },
     setIsPlaying: (state, action) => {
         state.currentlyOnTrack.isPlaying = action.payload.isPlaying
+    },
+    togglePlayBack: (state) => {
+        state.currentlyOnTrack.isPlaybackOpen = !state.currentlyOnTrack.isPlaybackOpen
     }
   },
 })
@@ -103,7 +107,8 @@ export const {
     addItemsToPlayList,
     removeItemFromPlayList,
     setCurrenlyPlaying,
-    setIsPlaying
+    setIsPlaying,
+    togglePlayBack
 } = mediaSlice.actions
-export const selectAudio = (state: RootState) => state.audio
+export const selectMeida = (state: RootState) => state.media
 export default mediaSlice.reducer
