@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { IFileDetail, IFileType, IMetaData } from "../../../../types";
+import { IFileDetail, IFileType, IMetaData, MediaLocation } from "../../../../types";
 import { MdPlayCircleOutline, MdPauseCircleOutline, MdDelete,MdMoreHoriz } from "react-icons/md";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { setCurrenlyPlaying, setIsPlaying } from "../../../../slices/MediaSclice";
@@ -13,7 +13,7 @@ const windowObj = window as typeof window & {
 
 export interface IAudioWrapper{
     fileDetail: IFileDetail,
-    location: string;
+    location: MediaLocation;
 }
 
 AudioWrapper.displayName = 'AudioWrapper';
@@ -55,12 +55,14 @@ export default function AudioWrapper(props: IAudioWrapper){
         }))
     }
     const isPlaying = useCallback(() => {
+        console.log('onTrackMedia:::', onTrackMedia, props.fileDetail.id);
         if(onTrackMedia.media?.id === props.fileDetail.id){
             return onTrackMedia.isPlaying
         }
         return false
         
     }, [onTrackMedia, props.fileDetail])
+   
     return (
         <div className="h-48 w-full rounded relative">
             <img

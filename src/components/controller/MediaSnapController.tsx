@@ -26,20 +26,7 @@ export interface IMediaSnapController{
 }
 MediaSnapController.displayName = 'MediaSnapController';
 export default function MediaSnapController(props: IMediaSnapController){
-    const isPlaying =  useAppSelector(state => state.media.currentlyOnTrack.isPlaying);
     const file =  useAppSelector(state => state.media.currentlyOnTrack.media?.file);
-    const dispatch = useAppDispatch();
-    
-    const playMedia = () => {
-        dispatch(setIsPlaying({
-            isPlaying: true
-        }))
-    }
-    const pauseMedia = () => {
-        dispatch(setIsPlaying({
-            isPlaying: false
-        }))
-    }
     
     return (
         <div className='h-89 media-tranparency'>
@@ -61,7 +48,7 @@ export default function MediaSnapController(props: IMediaSnapController){
                     <div 
                         onClick={props.toggleVideoPlayBack}
                         className="text-white max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap media-title-width" 
-                        title={props.metaData?.title ? props.metaData?.title : file?.name}>{props.metaData?.title ? file?.name : file?.name}
+                        title={props.metaData?.title ? props.metaData?.title : file?.name}>{props.metaData?.title ? props.metaData?.title : file?.name}
                     </div>
                 </div>
                 <div className="flex justify-center">

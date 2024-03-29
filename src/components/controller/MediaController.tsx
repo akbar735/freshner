@@ -16,6 +16,7 @@ import { togglePlayBack } from "../../slices/MediaSclice";
 import { useAppDispatch } from "../../hooks";
 import VideoPlayback from "./VideoPlayback";
 import Controllers from "./Controllers";
+import AudioPlayback from "./AudioPlayback";
 
 const windowObj = window as typeof window & {
     electronAPI: { 
@@ -147,6 +148,7 @@ export default function MediaController(props: IMediaController){
     const toggleVideoPlayBack = () => {
         dispatch(togglePlayBack())
     }
+ 
     return (
         <div className='border-t border-slate-300 h-89'>
             <div className="flex mt-3" >
@@ -164,20 +166,23 @@ export default function MediaController(props: IMediaController){
             </div>
             <div className="flex justify-center">
                 <div className="min-w-[120px] w-full ml-2 flex items-center cursor-pointer">   
-                    {fileType === 'audio' && file?.name && <>
-                        <audio 
-                            ref={audioRef} 
-                            src={file?.path} 
-                            onTimeUpdate={handleMediaTimeUpdate} onLoadedData ={onMediaLoad} 
-                            onEnded={handleOnEnded}>
-                        </audio>
-                        <img
-                        onClick={toggleVideoPlayBack}
-                        alt={file?.name}
-                        src={metaData?.picture?.base64Image}
-                        className={'h-48 w-full object-cover rounded track-media-title-size'}
-                    />
-                    </> 
+                    {fileType === 'audio' && file?.name && 
+                        <AudioPlayback 
+                            file={file}
+                            path={file.path}
+                            audioRef={audioRef}
+                            handleMediaTimeUpdate={handleMediaTimeUpdate}
+                            onMediaLoad={onMediaLoad}
+                            handleOnEnded={handleOnEnded} 
+                            getFirsEndPoint={getFirsEndPoint} 
+                            currentTime={currentTime} 
+                            totalDuration={totalDuration} 
+                            updateCurrentTime={updateCurrentTime} 
+                            metaData={metaData} 
+                            playMedia={playMedia} 
+                            pauseMedia={pauseMedia} 
+                            getLastEndPoint={getLastEndPoint}     
+                        />
                     }
                     {fileType === 'video' && file?.path && 
                     <VideoPlayback 
@@ -198,8 +203,8 @@ export default function MediaController(props: IMediaController){
                     }
                     <div 
                         onClick={toggleVideoPlayBack}
-                        className="max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap media-title-width" 
-                        title={metaData?.title ? metaData?.title : file?.name}>{metaData?.title ? file?.name : file?.name}
+                        className="max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap media-title-width h-full leading-[320%] px-1 hover:bg-slate-200 dark:hover:bg-slate-900 rounded-md" 
+                        title={metaData?.title ? metaData?.title : file?.name}>{metaData?.title ? metaData?.title : file?.name}
                     </div>
                 </div>
                 <div className="flex justify-center">

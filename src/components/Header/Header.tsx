@@ -14,7 +14,8 @@ const windowObj = window as typeof window & {
 
 Header.displayName = 'Header';
 export interface IHeader{
-    variant?: string
+    variant?: string;
+    onBackClickHandler?: VoidFunction;
 }
 export default function Header(props: IHeader){
     const navigate = useNavigate();
@@ -29,14 +30,14 @@ export default function Header(props: IHeader){
     const closeWindow = () => {
         windowObj.electronAPI.closeWindow()
     }  
-    const className = `${props.variant === 'snap' ? 'flex justify-between media-tranparency' :
+    const className = `${props.variant === 'snap' ? 'flex justify-between media-tranparency p-1.5' :
         'bg-slate-200 p-1.5 dark:bg-black flex justify-between border-b border-slate-300'}`
     //console.log("navigate", navigate('../')); 
 
     return (
         <div className={className}>
-            <div className="flex items-center">
-                <IconButton onCLick={() =>  navigate("..", { relative: "path" })} variant={props.variant}>
+            <div className="flex items-center" >
+                <IconButton onCLick={props.onBackClickHandler ? props.onBackClickHandler : () =>  navigate("..", { relative: "path" })} variant={props.variant}>
                     <ArrowLeftIcon className="h-5 w-5"/>
                 </IconButton>
             </div>

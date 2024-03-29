@@ -6,9 +6,11 @@ import { pagePath } from "./contants/page";
 import AudioGallery from "./pages/audio_gallery/AudioGallery";
 import VideoGallery from "./pages/video_gallery/VideoGallery";
 import Settings from "./pages/settings/Settings";
-
+import { useAppSelector } from "./hooks";
 App.displayName = 'App';
 export default function App(){
+    const state = useAppSelector(state => state)
+    console.log("state:::", state)
     return (
         <div className="bg-slate-100 dark:bg-gray-950 dark:text-white h-screen">
             <HashRouter>

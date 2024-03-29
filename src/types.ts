@@ -24,3 +24,9 @@ export interface IFileDetail{
     id: string;
 }
 
+export enum MediaLocation{
+    HOME='home',
+    AUDIOGALLERY='audioGallery',
+    VIDEOGALLERY='videoGallery',
+    PLAYLIST='playList'
+}
