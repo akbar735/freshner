@@ -98,7 +98,7 @@ export default function VideoPlayback(props: IVideoPlayback){
    
     return (
         <div style={playBackContainerStyle}>
-            <div className="relative cursor-default" onClick={(e) => e.stopPropagation()}>
+            <div className="relative cursor-default min-w-[80px]" onClick={(e) => e.stopPropagation()}>
                 <div className="absolute w-full z-[100]">{isPlayBackOpen && showVideoController && <Header variant="snap"  onBackClickHandler = {toggleVideoPlayBack}/>}</div>
                 <figure ref={videoContainerRef} onMouseMoveCapture={handleOnMouseMove} data-fullscreen="false" onDoubleClick={toggleFullScreen} >
                     <video 

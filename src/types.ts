@@ -16,7 +16,7 @@ export interface IFileType {
     path: string;
     size: string;
     type: string;
-    webkitRelativePath: string;
+    webkitRelativePath?: string;
 }
 
 export interface IFileDetail{
@@ -29,4 +29,19 @@ export enum MediaLocation{
     AUDIOGALLERY='audioGallery',
     VIDEOGALLERY='videoGallery',
     PLAYLIST='playList'
+}
+
+export enum PathKey{
+    AUDIOPATH = 'audioPath',
+    VIDEOPATH = 'videoPath'
+}
+
+export enum MediaMime{
+    AUDIO_MIME = 'audio/*',
+    VIDEO_MIME = 'video/*',
+}
+
+export enum MediaType{
+    AUDIO = 'audio',
+    VIDEO = 'video',
 }

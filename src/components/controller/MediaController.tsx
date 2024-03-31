@@ -39,7 +39,10 @@ export default function MediaController(props: IMediaController){
     const [metaData, setMetaData] =  useState<IMetaData>()
     const [totalDuration, setTotalDuration] = useState<number|null>(null);
     const [currentTime, setCurrentTime] = useState<number|null>(null);
-
+    const [cpbWidth, setCpbWidth] = useState(0);
+    const [onePixelRateInSec, setOnePixelRateInSec] = useState(0);
+    const [pbWidth, setPbWidth] = useState(0)
+    const pbRef = useRef(null);
     const getFileMetaData = async (file: IFileType) => {
         if(file.path){
             const metaData = await windowObj.electronAPI.getFileMetaData(file.path)
@@ -48,16 +51,6 @@ export default function MediaController(props: IMediaController){
             console.error('file path not found:')
         }
     }
-
-    useEffect(() => {
-        const mediaRef = audioRef.current ? audioRef.current : videoRef.current
-        if(mediaRef  && isPlaying){
-            mediaRef.play()
-            //mediaRef.requestFullscreen()
-        }else if(mediaRef && !isPlaying){
-            mediaRef.pause()
-        }
-    }, [audioRef.current, isPlaying, videoRef.current]);
 
     const onMediaLoad = useCallback(() => {
         const mediaRef = audioRef.current ? audioRef.current : videoRef.current
@@ -137,6 +130,33 @@ export default function MediaController(props: IMediaController){
             isPlaying: false
         }))
     }
+   
+
+    const toggleVideoPlayBack = () => {
+        dispatch(togglePlayBack())
+    }
+
+    
+    const updatePbWidth = useCallback(() =>{
+        const ele = pbRef.current
+        if(ele){
+            const widthInPx: string = window.getComputedStyle(ele).getPropertyValue('width');
+            const width = Number(widthInPx.substring(0, widthInPx.length-2))
+            setPbWidth(width);
+        }
+
+    }, [pbRef, setPbWidth])
+
+    useEffect(() => {
+        const mediaRef = audioRef.current ? audioRef.current : videoRef.current
+        if(mediaRef  && isPlaying){
+            mediaRef.play()
+            //mediaRef.requestFullscreen()
+        }else if(mediaRef && !isPlaying){
+            mediaRef.pause()
+        }
+    }, [audioRef.current, isPlaying, videoRef.current]);
+
     useEffect(() => {
         if(file){
             const fileType = getFileType(file.type);
@@ -145,23 +165,51 @@ export default function MediaController(props: IMediaController){
         }
     }, [file])
 
-    const toggleVideoPlayBack = () => {
-        dispatch(togglePlayBack())
-    }
- 
+    useEffect(() => {
+        if(currentTime) {
+            setCpbWidth(onePixelRateInSec * currentTime)
+        }else{
+            setCpbWidth(0)
+        }
+    }, [currentTime, onePixelRateInSec])
+    
+
+    useEffect(() => {
+        if(pbRef.current){
+            updatePbWidth()
+        }
+    }, [pbRef, updatePbWidth])
+
+    useEffect(() => {
+        window.addEventListener('resize', updatePbWidth);
+        return () => {
+            window.removeEventListener('resize', updatePbWidth);
+        }
+    }, [pbRef])
+
+    useEffect(() => {
+        if(totalDuration && pbWidth){
+            setOnePixelRateInSec(pbWidth / totalDuration);
+        }
+    },[pbWidth, totalDuration])
+
     return (
         <div className='border-t border-slate-300 h-89'>
             <div className="flex mt-3" >
                 <div className="ml-2 mr-2">{getFirsEndPoint}</div>
-                <input 
-                    className="brogress-bar" 
-                    type="range" 
-                    value={currentTime || 0}
-                    min={0}
-                    step={0.1}
-                    max={totalDuration || 0}
-                    onChange={updateCurrentTime}
-                />
+                <div className="w-full relative h-[3px] mt-[11px] bg-slate-800/50">
+                    <div className="absolute h-[3px] bg-[rgb(126,34,206)] dark:bg-white" style={{width: cpbWidth}}></div>
+                    <input 
+                        ref={pbRef}
+                        className="brogress-bar absolute" 
+                        type="range" 
+                        value={currentTime || 0}
+                        min={0}
+                        step={0.1}
+                        max={totalDuration || 0}
+                        onChange={updateCurrentTime}
+                    />
+                </div>
                 <div className="ml-2 mr-2">{getLastEndPoint}</div>
             </div>
             <div className="flex justify-center">
@@ -203,7 +251,7 @@ export default function MediaController(props: IMediaController){
                     }
                     <div 
                         onClick={toggleVideoPlayBack}
-                        className="max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap media-title-width h-full leading-[320%] px-1 hover:bg-slate-200 dark:hover:bg-slate-900 rounded-md" 
+                        className="max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap h-full leading-[320%] px-1 hover:bg-slate-200 dark:hover:bg-slate-900 rounded-md" 
                         title={metaData?.title ? metaData?.title : file?.name}>{metaData?.title ? metaData?.title : file?.name}
                     </div>
                 </div>

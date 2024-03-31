@@ -1,4 +1,4 @@
-import { IFileDetail, IFileType } from "./types"
+import { IFileDetail, IFileType, PathKey } from "./types"
 
 export function getFileType (mime: string){
     return mime.split('/')[0]
@@ -29,4 +29,20 @@ export function getOptimizedEndpoint(rormattedTime: string){
     hr = hr+':'
     min = min+':'
     return hr+min+sec
+}
+
+
+export function updateLocalStorage(name: PathKey, value: string){
+    const itmes = localStorage.getItem(name);
+    if(itmes){
+        const uniqueItmes = Array.from(new Set([...itmes.split(';'), value])).join(';')
+        localStorage.setItem(name, uniqueItmes)
+    }else{
+        localStorage.setItem(name, value)
+    }
+}
+
+export function getLocalStorageValue(name: PathKey){
+  const items = localStorage.getItem(name);
+  return items?.split(';') || []
 }

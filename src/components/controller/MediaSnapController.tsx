@@ -1,18 +1,8 @@
-import React, { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import './MediaController.css'
-import IconButton from "../IconButton/IconButton";
-import { 
-    MdPlayCircleOutline, 
-    MdPauseCircleOutline,
-    MdNavigateNext, 
-    MdNavigateBefore, 
-    MdForward5, 
-    MdReplay5 } from "react-icons/md";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import {useAppSelector } from "../../hooks";
 import { IMetaData } from "../../types";
-import { setIsPlaying } from "../../slices/MediaSclice";
 import Controllers from "./Controllers";
-
+import './MediaController.css'
 
 export interface IMediaSnapController{
     getFirsEndPoint: string;
@@ -27,27 +17,75 @@ export interface IMediaSnapController{
 MediaSnapController.displayName = 'MediaSnapController';
 export default function MediaSnapController(props: IMediaSnapController){
     const file =  useAppSelector(state => state.media.currentlyOnTrack.media?.file);
+    const [cpbWidth, setCpbWidth] = useState(0);
+    const [onePixelRateInSec, setOnePixelRateInSec] = useState(0);
+    const [pbWidth, setPbWidth] = useState(0)
+    const pbRef = useRef(null);
+    
+    const updatePbWidth = useCallback(() =>{
+        const ele = pbRef.current
+        if(ele){
+            const widthInPx: string = window.getComputedStyle(ele).getPropertyValue('width');
+            const width = Number(widthInPx.substring(0, widthInPx.length-2))
+            setPbWidth(width);
+        }
+
+    }, [pbRef, setPbWidth])
+    
+
+    useEffect(() => {
+        if(props.currentTime) {
+            setCpbWidth(onePixelRateInSec * props.currentTime)
+        }else{
+            setCpbWidth(0)
+        }
+    }, [props.currentTime, onePixelRateInSec])
+    
+
+    useEffect(() => {
+        if(pbRef.current){
+            updatePbWidth()
+        }
+    }, [pbRef, updatePbWidth])
+
+    useEffect(() => {
+        window.addEventListener('resize', updatePbWidth);
+        return () => {
+            window.removeEventListener('resize', updatePbWidth);
+        }
+    }, [pbRef])
+
+    useEffect(() => {
+        if(props.totalDuration && pbWidth){
+            setOnePixelRateInSec(pbWidth / props.totalDuration);
+        }
+    },[pbWidth, props.totalDuration])
     
     return (
         <div className='h-89 media-tranparency'>
             <div className="flex mt-3" >
                 <div className="ml-2 mr-2 text-white">{props.getFirsEndPoint}</div>
-                <input 
-                    className="brogress-bar brogress-bar-snap" 
-                    type="range" 
-                    value={props.currentTime || 0}
-                    min={0}
-                    step={0.1}
-                    max={props.totalDuration || 0}
-                    onChange={props.updateCurrentTime}
-                />
+                <div className="w-full relative h-[3px] mt-[11px] bg-slate-800/50">
+                <div className="absolute h-[3px] bg-white" style={{width: cpbWidth}}></div>
+                    <input 
+                        ref={pbRef}
+                        className="brogress-bar brogress-bar-snap absolute" 
+                        type="range" 
+                        value={props.currentTime || 0}
+                        min={0}
+                        step={0.1}
+                        max={props.totalDuration || 0}
+                        onChange={props.updateCurrentTime}
+                    />
+                </div>
+                
                 <div className="ml-2 mr-2 text-white">{props.getLastEndPoint}</div>
             </div>
             <div className="flex justify-center">
                 <div className={`min-w-[120px] w-full ml-2 flex items-center ${!props.isVideoInFullScreen() ? 'cursor-pointer': 'cursor-default'}`}>   
                     <div 
                         onClick={props.toggleVideoPlayBack}
-                        className="text-white max-w-[420px] ml-2 mr-2 overflow-hidden text-ellipsis whitespace-nowrap media-title-width" 
+                        className="text-white max-w-[420px] ml-2 mr-2 h-full leading-[320%] px-1 overflow-hidden text-ellipsis whitespace-nowrap hover:bg-slate-900/75 rounded-md" 
                         title={props.metaData?.title ? props.metaData?.title : file?.name}>{props.metaData?.title ? props.metaData?.title : file?.name}
                     </div>
                 </div>

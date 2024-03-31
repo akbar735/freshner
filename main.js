@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const { enableDrag } = require('electron-drag');
 const path = require('node:path')
-const { handleGetAudioFilesPath, handleGetFileMetaData } = require('./ipchandler/render.event.handler')
+const { getFiles, handleGetFileMetaData } = require('./ipchandler/render.event.handler')
+const { hadleGetFolderPath } = require('./ipchandler/getFolderPath')
 const { handleCreateAlbum } = require('./ipchandler/createAlbum')
 const { handleGetAllPlayList } = require('./ipchandler/getPlayList')
 
@@ -28,9 +29,11 @@ require('electron-reload')(__dirname, {
 })
 app.whenReady().then(async () => {
   ipcMain.handle('file:getAllPlayList', handleGetAllPlayList)
-  ipcMain.handle('file:getAudioFilesPath', handleGetAudioFilesPath)
+  ipcMain.handle('file:getFiles', getFiles)
   ipcMain.handle('file:createAlbum', handleCreateAlbum)
   ipcMain.handle('file:getFileMetaData', handleGetFileMetaData)
+  ipcMain.handle('folder:getFolderPath', () => hadleGetFolderPath(win))
+
 
   ipcMain.handle('close', () => {
     console.log("close")
