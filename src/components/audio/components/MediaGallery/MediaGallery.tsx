@@ -3,18 +3,15 @@ import { MdFolderOpen } from "react-icons/md";
 import { v4 as uuidv4 } from 'uuid';
 import { IFileDetail, IFileType, MediaLocation, MediaMime, MediaType, PathKey } from "../../../../types";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
-import { getFileType, getLoadedFile, getLocalStorageValue, updateLocalStorage } from "../../../../helper";
+import { getFileType, getLoadedFile, getLocalStorageValue, getSerializableFileDetail, updateLocalStorage } from "../../../../helper";
 import { addItemsToPlayList, initMediaState } from "../../../../slices/MediaSclice";
 import FilePickerButton from "../../../../widgets/button/FolderPickerButton";
 import AudioWrapper from "../AudioWrapper/AudioWrapper";
 import UnsupportedWrapper from "../UnsupportedWrapper/UnsupportedWrapper";
 import VideoWrapper from "../VideoWrapper/VideoWrapper";
+import { windowObj } from "../../../../electrone-api";
 
-const windowObj = window as typeof window & {
-    electronAPI: { 
-        getFiles: (arg0: string[], arg1: string) => IFileType[]
-    }
-};
+
 
 export interface IMediaGallery{
     pathKey: PathKey;
@@ -32,16 +29,15 @@ export default function MediaGallery(props: IMediaGallery){
         const files = await windowObj.electronAPI.getFiles(paths, props.mediaType)
         let fileDetailArr = files.map((file) => {
             return {
-                id: uuidv4(),
-                file: file
+                id: file.path,
+                file: getSerializableFileDetail(file)
             }
         })
         if(loadedFiles.length === 0){
             dispatch(initMediaState({
                 location: props.mediaLocation,
                 data: {
-                    autoPlay: false,
-                    playListLoop: false,
+                    playListLoop: true,
                     playLists: fileDetailArr
                 }
             }))
@@ -77,19 +73,16 @@ export default function MediaGallery(props: IMediaGallery){
                 <FilePickerButton 
                     label="Add Folder" 
                     onFolderSlected={onFolderSlected} 
-                    icon = {MdFolderOpen}
-                    desc={""} 
-                    accpet= {props.mediaMime}  
-                    onlyFolder={true}             
+                    icon = {MdFolderOpen}          
                 />
             </div>
             <div className="media-container-height overflow-auto">
                 <div className="grid media-wrppaer-width gap-4">
                   {loadedFiles.map((fileDetail: IFileDetail) => {
                         if(getFileType(fileDetail.file.type) === 'audio'){
-                            return <AudioWrapper fileDetail = {fileDetail} location = {props.mediaLocation} />
+                            return <AudioWrapper galaryView fileDetail = {fileDetail} location = {props.mediaLocation} />
                         }else if(getFileType(fileDetail.file.type) === 'video'){
-                            return <VideoWrapper fileDetail = {fileDetail} location = {props.mediaLocation} />
+                            return <VideoWrapper galaryView fileDetail = {fileDetail} location = {props.mediaLocation} />
                         }else{
                             return <UnsupportedWrapper />
                         }

@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { MdHome } from "react-icons/md";
 import { MdOutlineAudioFile } from "react-icons/md";
 import { MdOutlineTheaters } from "react-icons/md";
+import { MdList } from "react-icons/md";
 import { MdSettings } from "react-icons/md";
 import { pagePath } from "../../contants/page";
 SideBar.displayName = 'SideBar';
@@ -22,6 +23,11 @@ const pageLink = [
         path: pagePath.VIDEOGALLERY,
         label: 'Video Gallery',
         icon: MdOutlineTheaters
+    },
+    {
+        path: pagePath.PLAYLIST,
+        label: 'PlayLists',
+        icon: MdList
     }
 ]
 

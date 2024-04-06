@@ -4,13 +4,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { MdMaximize, MdMinimize } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-const windowObj = window as typeof window & {
-    electronAPI: { 
-        closeWindow: VoidFunction,
-        minimizeWindow: VoidFunction,
-        maximizeWindow: VoidFunction,
-    }
-};
+import { windowObj } from "../../electrone-api";
 
 Header.displayName = 'Header';
 export interface IHeader{

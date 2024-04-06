@@ -19,6 +19,19 @@ export interface IFileType {
     webkitRelativePath?: string;
 }
 
+export interface IPlayListDetail{
+    name: string;
+    path: string;
+}
+
+export interface ICurrentlyPlaying{
+        location: MediaLocation;
+        media: IFileDetail | null;
+        isPlaying: boolean;
+        isPlaybackOpen: boolean;
+}
+
+
 export interface IFileDetail{
     file: IFileType;
     id: string;
@@ -33,7 +46,8 @@ export enum MediaLocation{
 
 export enum PathKey{
     AUDIOPATH = 'audioPath',
-    VIDEOPATH = 'videoPath'
+    VIDEOPATH = 'videoPath',
+    RECENTLY_PLAYED = 'recentlyPlayed'
 }
 
 export enum MediaMime{
@@ -44,4 +58,9 @@ export enum MediaMime{
 export enum MediaType{
     AUDIO = 'audio',
     VIDEO = 'video',
+}
+
+export interface IOption{
+    value: string;
+    label: string;
 }

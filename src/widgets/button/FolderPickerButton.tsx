@@ -1,22 +1,14 @@
 import React, { useId, useRef } from "react";
 import { IconType } from "react-icons";
+import { windowObj } from "../../electrone-api";
 
-export interface IFilePickerButtonPopup{
+export interface IFolderPickerButtonPopup{
     label: string;
     onFolderSlected:(arg0: string) => void;
     icon?: IconType;
-    desc: string;
-    accpet: string;
-    onlyFolder?: boolean
 }
-const windowObj = window as typeof window & {
-    electronAPI: { 
-        getFolderPath: () => string
-    }
-};
 
-export default function FilePickerButton(props: IFilePickerButtonPopup){
-   
+export default function FolderPickerButton(props: IFolderPickerButtonPopup){
     const triggerFolderOpener = async () => {
         const path = await windowObj.electronAPI.getFolderPath()
         props.onFolderSlected(path)
@@ -27,7 +19,6 @@ export default function FilePickerButton(props: IFilePickerButtonPopup){
                     {props.icon && <props.icon className="text-lg" />}
                     <button onClick={triggerFolderOpener} className="text-sm rounded text-left ml-3">
                         <div>{props.label}</div>
-                        <p className="text-xsm text-slate-700 dark:text-slate-400">{props.desc}</p>
                     </button>
                 </label>
             </div>

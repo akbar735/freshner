@@ -1,10 +1,10 @@
-import { IFileDetail, IFileType, PathKey } from "./types"
+import { ICurrentlyPlaying, IFileDetail, IFileType, PathKey } from "./types"
 
 export function getFileType (mime: string){
     return mime.split('/')[0]
 }
 
-export function getSerializableFileDetail(file: File & {path?: string, lastModifiedDate?: string}){
+export function getSerializableFileDetail(file: IFileType){
     return {
         lastModified: file.lastModified ,
         lastModifiedDate: file.lastModifiedDate?.toString() ,
@@ -42,6 +42,48 @@ export function updateLocalStorage(name: PathKey, value: string){
     }
 }
 
+export function updateRecentlyPlayed(name: PathKey, value: {time: number, fileDetail: ICurrentlyPlaying}){
+    const itmes = localStorage.getItem(name);
+    if(itmes){
+        const parsedItems: {time: number, fileDetail: ICurrentlyPlaying}[] = JSON.parse(itmes);
+        if(parsedItems.length < 10){
+            const exitingItemIndex = parsedItems.findIndex(pItem => pItem.fileDetail.media?.id === value.fileDetail.media?.id)
+            if(exitingItemIndex > -1){
+                parsedItems[exitingItemIndex] = value
+            }else{
+                parsedItems.push(value)
+            }
+            localStorage.setItem(name, JSON.stringify(parsedItems))
+        }else{
+            const exitingItemIndex = parsedItems.findIndex(pItem => pItem.fileDetail.media?.id === value.fileDetail.media?.id)
+            if(exitingItemIndex > -1){
+                parsedItems[exitingItemIndex] = value
+            }else{
+                parsedItems.pop()
+                parsedItems.unshift(value)
+            }
+            localStorage.setItem(name, JSON.stringify(parsedItems))
+        }
+      
+    }else{
+        localStorage.setItem(name, JSON.stringify([value]))
+    }
+}
+export function getRecentlyPlayed(){
+    const recentlyPlayedItems = localStorage.getItem(PathKey.RECENTLY_PLAYED)
+    if(recentlyPlayedItems){
+        const parsedItems: {time: number, fileDetail: ICurrentlyPlaying}[] = JSON.parse(recentlyPlayedItems)
+        parsedItems.sort((item1, item2) =>(item2.time - item1.time))
+        const items = parsedItems.map(pI => {
+            return {
+                id: pI.fileDetail.media?.id,
+                file: pI.fileDetail.media?.file
+            }
+        })
+        return items
+    }
+    return null
+}
 export function getLocalStorageValue(name: PathKey){
   const items = localStorage.getItem(name);
   return items?.split(';') || []

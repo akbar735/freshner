@@ -4,17 +4,14 @@ import { IFileDetail, MediaLocation } from '../types';
 // Define a type for the slice state
 interface MediaState {
     home: {
-        autoPlay: boolean;
         playListLoop: boolean;
         playLists: IFileDetail[];
     },
     audioGallery: {
-        autoPlay: boolean;
         playListLoop: boolean;
         playLists: IFileDetail[];
     },
     videoGallery: {
-        autoPlay: boolean;
         playListLoop: boolean;
         playLists: IFileDetail[];
     },
@@ -23,6 +20,7 @@ interface MediaState {
         media: IFileDetail | null;
         isPlaying: boolean;
         isPlaybackOpen: boolean;
+        loop: boolean;
     },
     [index: string]: any;
 }
@@ -30,17 +28,14 @@ interface MediaState {
 // Define the initial state using that type
 const initialState: MediaState = {
     home: {
-        autoPlay: false,
         playListLoop: false,
         playLists: []
     },
     audioGallery: {
-        autoPlay: false,
-        playListLoop: false,
+        playListLoop: true,
         playLists: []
     },
     videoGallery: {
-        autoPlay: false,
         playListLoop: false,
         playLists: []
     },
@@ -48,7 +43,8 @@ const initialState: MediaState = {
         location: MediaLocation.HOME,
         media: null,
         isPlaying: false,
-        isPlaybackOpen: false
+        isPlaybackOpen: false,
+        loop: false,
     }
 }
 
@@ -59,9 +55,6 @@ export const mediaSlice = createSlice({
   reducers: {
     initMediaState: (state, action) => {
       state[action.payload.location] = action.payload.data
-    },
-    tiggleAutoPlay: (state, action) => {
-        state[action.payload.location].autoPlay = !state[action.payload.location].autoPlay
     },
     tigglePlayListLoop: (state, action) => {
         state[action.payload.location].playListLoop = !state[action.payload.location].playListLoop
@@ -102,7 +95,6 @@ export const mediaSlice = createSlice({
 
 export const { 
     initMediaState, 
-    tiggleAutoPlay, 
     tigglePlayListLoop,
     addItemToPlayList,
     addItemsToPlayList,

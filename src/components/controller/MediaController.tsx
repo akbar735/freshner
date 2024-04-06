@@ -10,19 +10,14 @@ import {
     MdReplay5 } from "react-icons/md";
 import { useAppSelector } from "../../hooks";
 import { getFileType, getOptimizedEndpoint } from "../../helper";
-import { IFileType, IMetaData } from "../../types";
-import { setIsPlaying } from "../../slices/MediaSclice";
+import { IFileDetail, IFileType, IMetaData } from "../../types";
+import { setCurrenlyPlaying, setIsPlaying } from "../../slices/MediaSclice";
 import { togglePlayBack } from "../../slices/MediaSclice";
 import { useAppDispatch } from "../../hooks";
 import VideoPlayback from "./VideoPlayback";
 import Controllers from "./Controllers";
 import AudioPlayback from "./AudioPlayback";
-
-const windowObj = window as typeof window & {
-    electronAPI: { 
-        getFileMetaData: (url: string) => IMetaData
-    }
-};
+import { windowObj } from "../../electrone-api";
 
 export interface IMediaController{
     
@@ -32,6 +27,11 @@ export default function MediaController(props: IMediaController){
     const dispatch = useAppDispatch();
     const file =  useAppSelector(state => state.media.currentlyOnTrack.media?.file);
     const isPlaying =  useAppSelector(state => state.media.currentlyOnTrack.isPlaying);
+    const loop =  useAppSelector(state => state.media.currentlyOnTrack.loop);
+    const location = useAppSelector(state => state.media.currentlyOnTrack.location);
+
+    const playListLoop = useAppSelector(state => state.media[location].playListLoop)
+    const playLists = useAppSelector<IFileDetail[]>(state => state.media[location].playLists)
 
     const [fileType, setFileType] = useState('');
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -65,7 +65,7 @@ export default function MediaController(props: IMediaController){
         const currentTime: number = (event.target as HTMLMediaElement).currentTime;
         setCurrentTime(currentTime)
     }
-
+    
     const getFirsEndPoint = useMemo(() => {
        
         let timeInSec = currentTime ? Math.round(currentTime) : 0
@@ -114,12 +114,28 @@ export default function MediaController(props: IMediaController){
         }
     }, [audioRef.current, videoRef.current]); 
 
-    const handleOnEnded = () => {
+    const handleOnEnded = useCallback(() => {
         setCurrentTime(0);
-        dispatch(setIsPlaying({
-            isPlaying: false
-        }))
-    }
+        if(loop){
+            const mediaRef = audioRef.current ? audioRef.current : videoRef.current
+            if(mediaRef) mediaRef.play()
+        }else if(playListLoop){
+            const currentPlayingIndex = playLists.findIndex(item => item.file.path === file?.path)
+            const nextPlayingIndex = currentPlayingIndex+1 === playLists.length ? 0 : currentPlayingIndex + 1
+            const nextMedia = playLists[nextPlayingIndex];
+            dispatch(setCurrenlyPlaying({
+                media: nextMedia,
+                location: location,
+                isPlaying: true
+            }))
+
+        }else{
+            dispatch(setIsPlaying({
+                isPlaying: false
+            }))
+        }
+
+    }, [audioRef.current, videoRef.current, playLists, playListLoop, file])
     const playMedia = () => {
         dispatch(setIsPlaying({
             isPlaying: true
