@@ -1,8 +1,11 @@
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
-import {useAppSelector } from "../../hooks";
+import {useAppDispatch, useAppSelector } from "../../hooks";
 import { IMetaData } from "../../types";
 import Controllers from "./Controllers";
 import './MediaController.css'
+import IconButton from "../IconButton/IconButton";
+import { TbRepeat, TbRepeatOff } from "react-icons/tb";
+import { toggleLoop } from "../../slices/MediaSclice";
 
 export interface IMediaSnapController{
     getFirsEndPoint: string;
@@ -16,8 +19,10 @@ export interface IMediaSnapController{
 }
 MediaSnapController.displayName = 'MediaSnapController';
 export default function MediaSnapController(props: IMediaSnapController){
+    const dispatch = useAppDispatch();
     const file =  useAppSelector(state => state.media.currentlyOnTrack.media?.file);
     const [cpbWidth, setCpbWidth] = useState(0);
+    const loop = useAppSelector(state => state.media.currentlyOnTrack.loop)
     const [onePixelRateInSec, setOnePixelRateInSec] = useState(0);
     const [pbWidth, setPbWidth] = useState(0)
     const pbRef = useRef(null);
@@ -32,7 +37,9 @@ export default function MediaSnapController(props: IMediaSnapController){
 
     }, [pbRef, setPbWidth])
     
-
+    const handleToggleLoop = () => {
+        dispatch(toggleLoop())
+    }
     useEffect(() => {
         if(props.currentTime) {
             setCpbWidth(onePixelRateInSec * props.currentTime)
@@ -92,8 +99,10 @@ export default function MediaSnapController(props: IMediaSnapController){
                 <div className="flex justify-center">
                     <Controllers buttonVariant="snap" />
                 </div>
-                <div className="w-full">   
-                    
+                <div className="w-full flex justify-between items-center">  
+                    <IconButton style = {{alignSelf: 'center', marginLeft: '30px'}} onCLick={handleToggleLoop} >
+                        {loop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
+                    </IconButton>
                 </div>
             </div>
         </div>

@@ -11,13 +11,14 @@ import {
 import { useAppSelector } from "../../hooks";
 import { getFileType, getOptimizedEndpoint } from "../../helper";
 import { IFileDetail, IFileType, IMetaData } from "../../types";
-import { setCurrenlyPlaying, setIsPlaying } from "../../slices/MediaSclice";
+import { setCurrenlyPlaying, setIsPlaying, toggleLoop } from "../../slices/MediaSclice";
 import { togglePlayBack } from "../../slices/MediaSclice";
 import { useAppDispatch } from "../../hooks";
 import VideoPlayback from "./VideoPlayback";
 import Controllers from "./Controllers";
 import AudioPlayback from "./AudioPlayback";
 import { windowObj } from "../../electrone-api";
+import { TbRepeat, TbRepeatOff } from "react-icons/tb";
 
 export interface IMediaController{
     
@@ -122,20 +123,26 @@ export default function MediaController(props: IMediaController){
         }else if(playListLoop){
             const currentPlayingIndex = playLists.findIndex(item => item.file.path === file?.path)
             const nextPlayingIndex = currentPlayingIndex+1 === playLists.length ? 0 : currentPlayingIndex + 1
+            console.log('nextPlayingIndex::', nextPlayingIndex, currentPlayingIndex);
             const nextMedia = playLists[nextPlayingIndex];
-            dispatch(setCurrenlyPlaying({
-                media: nextMedia,
-                location: location,
-                isPlaying: true
-            }))
-
+            if(currentPlayingIndex !== nextPlayingIndex){
+                dispatch(setCurrenlyPlaying({
+                    media: nextMedia,
+                    location: location,
+                    isPlaying: true
+                }))
+            }else{
+                dispatch(setIsPlaying({
+                    isPlaying: false
+                }))
+            }
         }else{
             dispatch(setIsPlaying({
                 isPlaying: false
             }))
         }
 
-    }, [audioRef.current, videoRef.current, playLists, playListLoop, file])
+    }, [audioRef.current, videoRef.current, playLists, playListLoop, file, loop])
     const playMedia = () => {
         dispatch(setIsPlaying({
             isPlaying: true
@@ -163,6 +170,9 @@ export default function MediaController(props: IMediaController){
 
     }, [pbRef, setPbWidth])
 
+    const handleToggleLoop = () => {
+        dispatch(toggleLoop())
+    }
     useEffect(() => {
         const mediaRef = audioRef.current ? audioRef.current : videoRef.current
         if(mediaRef  && isPlaying){
@@ -208,6 +218,8 @@ export default function MediaController(props: IMediaController){
             setOnePixelRateInSec(pbWidth / totalDuration);
         }
     },[pbWidth, totalDuration])
+
+    console.log('loop::', loop);
 
     return (
         <div className='border-t border-slate-300 h-89'>
@@ -274,8 +286,11 @@ export default function MediaController(props: IMediaController){
                 <div className="flex justify-center">
                     <Controllers />
                 </div>
-                <div className="w-full">   
-                    
+                <div className="w-full flex justify-between items-center">   
+                    <IconButton  style = {{alignSelf: 'center', marginLeft: '30px'}} onCLick={handleToggleLoop} >
+                        {loop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
+                    </IconButton>
+                    <div>VC</div>
                 </div>
             </div>
         </div>

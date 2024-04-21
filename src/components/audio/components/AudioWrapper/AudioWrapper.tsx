@@ -60,8 +60,8 @@ export default function AudioWrapper(props: IAudioWrapper){
    
     return (
         <>
-            {!props.galaryView ? 
-            <div className="bg-slate-300 dark:bg-slate-800 w-36 h-44 m-2 rounded relative">
+           
+            {!props.galaryView && <div className="bg-slate-300 dark:bg-slate-800 w-36 h-44 m-2 rounded relative">
                 <img
                     alt={props.fileDetail.file.name}
                     src={metaData?.picture?.base64Image}
@@ -84,8 +84,9 @@ export default function AudioWrapper(props: IAudioWrapper){
                      <MdMoreHoriz className="size-5 cursor-pointer mr-1" />
                 </div>
                
-            </div>
-            :<div className="h-48 w-full rounded relative">
+            </div>}
+            
+            {props.galaryView && <div className="h-48 w-full rounded relative">
                 <img
                     alt={props.fileDetail.file.name}
                     src={metaData?.picture?.base64Image}
@@ -109,8 +110,8 @@ export default function AudioWrapper(props: IAudioWrapper){
                         <MdMoreHoriz className="size-5 cursor-pointer block absolute bottom-2 right-2" />
                     </div>
                 </div>
-            </div>
-            }
+            </div>}
+        
         </>
         
     )

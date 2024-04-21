@@ -15,6 +15,10 @@ interface MediaState {
         playListLoop: boolean;
         playLists: IFileDetail[];
     },
+    playList: {
+        playListLoop: boolean;
+        playLists: IFileDetail[];
+    },
     currentlyOnTrack: {
         location: MediaLocation;
         media: IFileDetail | null;
@@ -32,10 +36,14 @@ const initialState: MediaState = {
         playLists: []
     },
     audioGallery: {
-        playListLoop: true,
+        playListLoop: false,
         playLists: []
     },
     videoGallery: {
+        playListLoop: false,
+        playLists: []
+    },
+    playList: {
         playListLoop: false,
         playLists: []
     },
@@ -56,8 +64,11 @@ export const mediaSlice = createSlice({
     initMediaState: (state, action) => {
       state[action.payload.location] = action.payload.data
     },
-    tigglePlayListLoop: (state, action) => {
+    togglePlayListLoop: (state, action) => {
         state[action.payload.location].playListLoop = !state[action.payload.location].playListLoop
+    },
+    toggleLoop : (state) => {
+        state.currentlyOnTrack.loop = !state.currentlyOnTrack.loop
     },
     addItemToPlayList : (state, action) => {
         const playList = [...state[action.payload.location].playLists]
@@ -95,7 +106,8 @@ export const mediaSlice = createSlice({
 
 export const { 
     initMediaState, 
-    tigglePlayListLoop,
+    togglePlayListLoop,
+    toggleLoop,
     addItemToPlayList,
     addItemsToPlayList,
     removeItemFromPlayList,

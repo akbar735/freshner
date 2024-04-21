@@ -4,18 +4,20 @@ import { getFileType, getLoadedFile, getRecentlyPlayed, getSerializableFileDetai
 import AudioWrapper from "../components/audio/components/AudioWrapper/AudioWrapper";
 import VideoWrapper from "../components/audio/components/VideoWrapper/VideoWrapper";
 import UnsupportedWrapper from "../components/audio/components/UnsupportedWrapper/UnsupportedWrapper";
-import { addItemsToPlayList, initMediaState, setCurrenlyPlaying } from "../slices/MediaSclice";
-import { v4 as uuidv4 } from 'uuid';
+import { togglePlayListLoop, initMediaState, setCurrenlyPlaying } from "../slices/MediaSclice";
+import { TbRepeat } from "react-icons/tb";
+import { TbRepeatOff } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { IFileDetail, IFileType, MediaLocation } from "../types";
 import FilePickerButton from "../widgets/button/FilePickerButton";
+import IconButton from "../components/IconButton/IconButton";
 
 
 Home.displayName = 'Home';
 export default function Home(){
     const dispatch = useAppDispatch();
     const files = useAppSelector(state => state.media.home.playLists)
- 
+    const playListLoop = useAppSelector(state => state.media.home.playListLoop)
     const updateLocalFileList = useCallback((fileArr: File[]) => {
        
         let fileDetailArr = fileArr.map((file:  File & {path?: string, lastModifiedDate?: string}) => {
@@ -58,14 +60,18 @@ export default function Home(){
         }
     }, [updateLocalFileList, files]);
 
+    const handleTogglePlayListLoop = () => {
+        dispatch(togglePlayListLoop({
+            location: MediaLocation.HOME,
+        }))
+    }
     useEffect(() => {
         const recentlyPlayed = getRecentlyPlayed()
             if(recentlyPlayed){
                 dispatch(initMediaState({
                     location: MediaLocation.HOME,
                     data: {
-                        autoPlay: false,
-                        playListLoop: false,
+                        playListLoop: playListLoop,
                         playLists: recentlyPlayed
                     }
                 }))
@@ -74,6 +80,9 @@ export default function Home(){
     return (
         <div className="app-content-height overflow-auto w-full p-2">
             <div className="flex justify-end mb-2"> 
+                <IconButton style = {{alignSelf: 'center', marginRight: '10px'}} onCLick={handleTogglePlayListLoop} >
+                    {playListLoop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
+                </IconButton>
                 <FilePickerButton 
                     label="Open Media" 
                     onFilesSlected={handleFileSelection} 

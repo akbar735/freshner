@@ -4,12 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { IFileDetail, IFileType, MediaLocation, MediaMime, MediaType, PathKey } from "../../../../types";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import { getFileType, getLoadedFile, getLocalStorageValue, getSerializableFileDetail, updateLocalStorage } from "../../../../helper";
-import { addItemsToPlayList, initMediaState } from "../../../../slices/MediaSclice";
+import { addItemsToPlayList, initMediaState, togglePlayListLoop } from "../../../../slices/MediaSclice";
 import FilePickerButton from "../../../../widgets/button/FolderPickerButton";
 import AudioWrapper from "../AudioWrapper/AudioWrapper";
 import UnsupportedWrapper from "../UnsupportedWrapper/UnsupportedWrapper";
 import VideoWrapper from "../VideoWrapper/VideoWrapper";
 import { windowObj } from "../../../../electrone-api";
+import IconButton from "../../../IconButton/IconButton";
+import { TbRepeat, TbRepeatOff } from "react-icons/tb";
 
 
 
@@ -23,7 +25,8 @@ MediaGallery.displayName = 'MediaGallery';
 export default function MediaGallery(props: IMediaGallery){
     const dispatch = useAppDispatch();
     const loadedFiles = useAppSelector(state => state.media[props.mediaLocation].playLists)
-    
+    const playListLoop = useAppSelector(state => state.media[props.mediaLocation].playListLoop)
+
     const loadMediaFiles = useCallback(async () => {
         const paths= getLocalStorageValue(props.pathKey)
         const files = await windowObj.electronAPI.getFiles(paths, props.mediaType)
@@ -37,7 +40,6 @@ export default function MediaGallery(props: IMediaGallery){
             dispatch(initMediaState({
                 location: props.mediaLocation,
                 data: {
-                    playListLoop: true,
                     playLists: fileDetailArr
                 }
             }))
@@ -63,6 +65,12 @@ export default function MediaGallery(props: IMediaGallery){
         }
     }, []);
 
+    const handleTogglePlayListLoop = () => {
+        dispatch(togglePlayListLoop({
+            location: props.mediaLocation,
+        }))
+    }
+    
     useEffect(() => {
         loadMediaFiles()
     },[])
@@ -70,6 +78,9 @@ export default function MediaGallery(props: IMediaGallery){
     return (
         <div className="app-content-height overflow-auto w-full p-2">
             <div className="flex justify-end mb-2"> 
+                <IconButton style = {{alignSelf: 'center', marginRight: '10px'}} onCLick={handleTogglePlayListLoop} >
+                    {playListLoop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
+                </IconButton>
                 <FilePickerButton 
                     label="Add Folder" 
                     onFolderSlected={onFolderSlected} 
