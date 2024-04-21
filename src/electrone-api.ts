@@ -8,6 +8,7 @@ export const windowObj = window as typeof window & {
         minimizeWindow: VoidFunction,
         maximizeWindow: VoidFunction,
         getFolderPath: () => string,
-        getAllPlayList: () => IPlayListDetail[]
+        getAllPlayList: () => IPlayListDetail[],
+        getAllFiles: (arg0: string) => IFileType[]
     }
 };

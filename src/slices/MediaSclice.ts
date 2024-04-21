@@ -15,6 +15,10 @@ interface MediaState {
         playListLoop: boolean;
         playLists: IFileDetail[];
     },
+    playList: {
+        playListLoop: boolean;
+        playLists: IFileDetail[];
+    },
     currentlyOnTrack: {
         location: MediaLocation;
         media: IFileDetail | null;
@@ -36,6 +40,10 @@ const initialState: MediaState = {
         playLists: []
     },
     videoGallery: {
+        playListLoop: false,
+        playLists: []
+    },
+    playList: {
         playListLoop: false,
         playLists: []
     },

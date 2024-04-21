@@ -44,15 +44,27 @@ const handleGetFileMetaData = async (_event, url) => {
 const getFiles = async (_event, foldersArr, fileType) => {
   const files = []
   for(let i=0; i<foldersArr.length; i++){
-    const audioFiles = await fs.promises.readdir(foldersArr[i]);
+    let audioFiles = []
+    try{
+        audioFiles = await fs.promises.readdir(foldersArr[i]);
+    }catch(err){
+        console.error(err)
+    }
+   
     audioFiles.forEach(file => {
         const filePath = path.join(foldersArr[i], file); // Get the full path of the file
-        const fileStat = fs.statSync(filePath); // Get the file's stats
+        let fileStat = '';
+        try{
+             fileStat = fs.statSync(filePath); // Get the file's stats
+        }catch(err){
+            console.error(err)
+        }
+       
 
-        if (fileStat.isDirectory()) {
+        if(fileStat && fileStat.isDirectory()) {
             // If it's a directory, recursively call readDirectoryRecursively
            // readDirectoryRecursively(filePath);
-        } else {
+        } else if(fileStat) {
             // If it's a file, print its details
             const type =  isAudioOrVideo(filePath)
             if(type === fileType){
@@ -71,7 +83,48 @@ const getFiles = async (_event, foldersArr, fileType) => {
   return files;
 }
 
+const getAllFiles = async (_event, folder, fileType) => {
+    const files = []
+    const containerPath = path.join(__dirname,'..','data', 'play-list', folder);
+    let mediaFiles = []
+    try{
+        mediaFiles = await fs.promises.readdir(containerPath);
+    }catch(err){
+        console.error(err)
+    }
+      
+      mediaFiles.forEach(file => {
+        let filePath = ''
+        try{
+            filePath = path.join(containerPath, file);
+        }catch(err){
+            console.error(err);
+        }
+        const fileStat = fs.statSync(filePath); // Get the file's stats
+  
+          if (fileStat.isDirectory()) {
+              // If it's a directory, recursively call readDirectoryRecursively
+             // readDirectoryRecursively(filePath);
+          } else {
+              // If it's a file, print its details
+              const type =  isAudioOrVideo(filePath)
+              if(type === 'audio' || type === 'video'){
+                  files.push({
+                      lastModified: fileStat.mtimeMs,
+                      lastModifiedDate: fileStat.mtime,
+                      name: file,
+                      path: filePath,
+                      size: fileStat.size,
+                      type: type
+                  })
+              }
+          }
+      });
+    return files;
+  }
+
 module.exports ={
     getFiles,
+    getAllFiles,
     handleGetFileMetaData
 }
