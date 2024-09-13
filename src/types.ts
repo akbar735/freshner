@@ -64,3 +64,11 @@ export interface IOption{
     value: string;
     label: string;
 }
+
+export enum KEYCODE{
+    ArrowDown = 'ArrowDown',
+    ArrowRight = 'ArrowRight',
+    ArrowUp = 'ArrowUp',
+    ArrowLeft = 'ArrowLeft',
+    Space = 'Space'
+}

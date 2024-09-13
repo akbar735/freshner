@@ -62,20 +62,25 @@ export const mediaSlice = createSlice({
   initialState,
   reducers: {
     initMediaState: (state, action) => {
+      console.log('initMediaState', action)
       state[action.payload.location] = action.payload.data
     },
     togglePlayListLoop: (state, action) => {
+        console.log('togglePlayListLoop', action)
         state[action.payload.location].playListLoop = !state[action.payload.location].playListLoop
     },
     toggleLoop : (state) => {
+        console.log('toggleLoop')
         state.currentlyOnTrack.loop = !state.currentlyOnTrack.loop
     },
     addItemToPlayList : (state, action) => {
+        console.log('addItemToPlayList', action)
         const playList = [...state[action.payload.location].playLists]
         playList.push(action.payload.mediaPath)
         state[action.payload.location].playLists = playList
     },
     addItemsToPlayList : (state, action) => {
+        console.log('addItemsToPlayList', action)
         let playList = [...state[action.payload.location].playLists]
         playList = [...playList, ...action.payload.media]
         const uniqPaths = Array.from(new Set([...playList.map(el => el?.file?.path), ...action.payload.media.map((el: IFileDetail) => el?.file?.path)]))
@@ -85,20 +90,24 @@ export const mediaSlice = createSlice({
         state[action.payload.location].playLists = uniqePlayList
     },
     removeItemFromPlayList : (state, action) => {
+        console.log('removeItemFromPlayList', action)
         const playList = [...state[action.payload.location].playLists]
         playList.splice(action.payload.itemIndex, 1);
         state[action.payload.location].playLists = playList
     },
     setCurrenlyPlaying: (state, action) => {
+        console.log('setCurrenlyPlaying', action.payload.isPlaybackOpen)
         state.currentlyOnTrack.media = action.payload.media
         state.currentlyOnTrack.location = action.payload.location
         state.currentlyOnTrack.isPlaying = !!action.payload.isPlaying
         state.currentlyOnTrack.isPlaybackOpen = !!action.payload.isPlaybackOpen
     },
     setIsPlaying: (state, action) => {
+        console.log('setIsPlaying', action)
         state.currentlyOnTrack.isPlaying = action.payload.isPlaying
     },
     togglePlayBack: (state) => {
+        console.log('togglePlayBack')
         state.currentlyOnTrack.isPlaybackOpen = !state.currentlyOnTrack.isPlaybackOpen
     }
   },

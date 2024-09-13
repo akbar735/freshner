@@ -4,18 +4,25 @@ import { IMetaData } from "../../types";
 import Controllers from "./Controllers";
 import './MediaController.css'
 import IconButton from "../IconButton/IconButton";
-import { TbRepeat, TbRepeatOff } from "react-icons/tb";
+import { TbRepeat, TbRepeatOff, TbVolume, TbVolume2, TbVolume3 } from "react-icons/tb";
 import { toggleLoop } from "../../slices/MediaSclice";
 
 export interface IMediaSnapController{
     getFirsEndPoint: string;
     currentTime:  number | null;
     totalDuration:  number | null;
+    volume: number | null;
     updateCurrentTime:  (event: ChangeEvent<HTMLInputElement>) => void;
+    updateMediaVolume: (event: ChangeEvent<HTMLInputElement>) => void;
+    rewindFiveSeconds: VoidFunction;
+    forwardFiveSeconds: VoidFunction;
+    toggleVolume: VoidFunction;
     metaData: IMetaData | undefined;
     getLastEndPoint: string;
     toggleVideoPlayBack: VoidFunction;
-    isVideoInFullScreen: () => boolean
+    isVideoInFullScreen: () => boolean;
+    playPrevious: VoidFunction;
+    playNext: VoidFunction;
 }
 MediaSnapController.displayName = 'MediaSnapController';
 export default function MediaSnapController(props: IMediaSnapController){
@@ -26,7 +33,7 @@ export default function MediaSnapController(props: IMediaSnapController){
     const [onePixelRateInSec, setOnePixelRateInSec] = useState(0);
     const [pbWidth, setPbWidth] = useState(0)
     const pbRef = useRef(null);
-    
+
     const updatePbWidth = useCallback(() =>{
         const ele = pbRef.current
         if(ele){
@@ -36,6 +43,7 @@ export default function MediaSnapController(props: IMediaSnapController){
         }
 
     }, [pbRef, setPbWidth])
+    
     
     const handleToggleLoop = () => {
         dispatch(toggleLoop())
@@ -97,12 +105,39 @@ export default function MediaSnapController(props: IMediaSnapController){
                     </div>
                 </div>
                 <div className="flex justify-center">
-                    <Controllers buttonVariant="snap" />
+                    <Controllers buttonVariant="snap"
+                        rewindFiveSeconds={props.rewindFiveSeconds}
+                        forwardFiveSeconds={props.forwardFiveSeconds} 
+                        playPrevious={props.playPrevious} 
+                        playNext={props.playNext}                    
+                    />
                 </div>
                 <div className="w-full flex justify-between items-center">  
-                    <IconButton style = {{alignSelf: 'center', marginLeft: '30px'}} onCLick={handleToggleLoop} >
+                    <IconButton style = {{alignSelf: 'center', marginLeft: '30px'}} variant="snap"  onCLick={handleToggleLoop} >
                         {loop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
                     </IconButton>
+                    <div className="flex justify-between items-center">
+                        <IconButton  style = {{alignSelf: 'center', marginRight: '10px'}} variant="snap" onCLick={props.toggleVolume} >
+                            <div>
+                                {(props.volume?? 0) === 0 ? <TbVolume3 className="h-6 w-6" />: ''}
+                                {(props.volume?? 0) > 0 && (props.volume?? 0) <= 0.5 ? <TbVolume2 className="h-6 w-6" />: ''}
+                                {(props.volume?? 0) > 0.5 ? <TbVolume className="h-6 w-6" />: ''}
+                            </div>
+                        </IconButton>
+                        <div className="w-16 relative h-[3px] bg-slate-800/50 mr-3">
+                            <div className="absolute h-[3px] bg-white" style={{width: (props.volume??0) * 64}}></div>
+                                <input 
+                                    className="brogress-bar brogress-bar-snap absolute" 
+                                    type="range" 
+                                    value={props.volume || 0}
+                                    min={0}
+                                    step={0.01}
+                                    max={1}
+                                    onChange={props.updateMediaVolume}
+                                />
+                            </div>
+                        </div>
+                    
                 </div>
             </div>
         </div>
