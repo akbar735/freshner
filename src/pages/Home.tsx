@@ -5,12 +5,9 @@ import AudioWrapper from "../components/audio/components/AudioWrapper/AudioWrapp
 import VideoWrapper from "../components/audio/components/VideoWrapper/VideoWrapper";
 import UnsupportedWrapper from "../components/audio/components/UnsupportedWrapper/UnsupportedWrapper";
 import { togglePlayListLoop, initMediaState, setCurrenlyPlaying } from "../slices/MediaSclice";
-import { TbRepeat } from "react-icons/tb";
-import { TbRepeatOff } from "react-icons/tb";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { IFileDetail, IFileType, MediaLocation } from "../types";
 import FilePickerButton from "../widgets/button/FilePickerButton";
-import IconButton from "../components/IconButton/IconButton";
 
 
 Home.displayName = 'Home';
@@ -80,9 +77,6 @@ export default function Home(){
     return (
         <div className="app-content-height overflow-auto w-full p-2">
             <div className="flex justify-end mb-2"> 
-                <IconButton style = {{alignSelf: 'center', marginRight: '10px'}} onCLick={handleTogglePlayListLoop} >
-                    {playListLoop ? <TbRepeat className="h-6 w-6" />: <TbRepeatOff className="h-6 w-6"/>}
-                </IconButton>
                 <FilePickerButton 
                     label="Open Media" 
                     onFilesSlected={handleFileSelection} 

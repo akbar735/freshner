@@ -28,33 +28,39 @@ export default function MediaGallery(props: IMediaGallery){
     const playListLoop = useAppSelector(state => state.media[props.mediaLocation].playListLoop)
 
     const loadMediaFiles = useCallback(async () => {
-        const paths= getLocalStorageValue(props.pathKey)
-        const files = await windowObj.electronAPI.getFiles(paths, props.mediaType)
-        let fileDetailArr = files.map((file) => {
-            return {
-                id: file.path,
-                file: getSerializableFileDetail(file)
-            }
-        })
-        if(loadedFiles.length === 0){
-            dispatch(initMediaState({
-                location: props.mediaLocation,
-                data: {
-                    playLists: fileDetailArr
+        new Promise(async (resolve, reject) => {
+            const paths= getLocalStorageValue(props.pathKey)
+            const files = await windowObj.electronAPI.getFiles(paths, props.mediaType)
+            let fileDetailArr = files.map((file) => {
+                return {
+                    id: file.path,
+                    file: getSerializableFileDetail(file)
                 }
-            }))
-        }else{
-            const unloadedMedia = fileDetailArr.filter(fileD => {
-                if(fileD.file.path === getLoadedFile(fileD.file as unknown as File & {path?: string}, loadedFiles)?.file.path){
-                    return false
-                }
-                return true
             })
-            dispatch(addItemsToPlayList({
-                media: unloadedMedia,
-                location: props.mediaLocation,
-            }))
-        }
+            if(loadedFiles.length === 0){
+                dispatch(initMediaState({
+                    location: props.mediaLocation,
+                    data: {
+                        playLists: fileDetailArr
+                    }
+                }))
+            }else{
+                const unloadedMedia = fileDetailArr.filter(fileD => {
+                    if(fileD.file.path === getLoadedFile(fileD.file as unknown as File & {path?: string}, loadedFiles)?.file.path){
+                        return false
+                    }
+                    return true
+                })
+                dispatch(addItemsToPlayList({
+                    media: unloadedMedia,
+                    location: props.mediaLocation,
+                }))
+            }
+            resolve('files loaded')
+        }).then(res => {
+            console.log(res)
+        })
+        
         
     }, [loadedFiles])
 

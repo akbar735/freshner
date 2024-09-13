@@ -1,4 +1,4 @@
-import React, { CSSProperties, ChangeEvent, MouseEventHandler, RefObject, useCallback, useMemo, useRef, useState } from "react";
+import React, { CSSProperties, ChangeEvent, MouseEventHandler, RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import Header from "../Header/Header";
 import { togglePlayBack } from "../../slices/MediaSclice";
@@ -11,25 +11,31 @@ export interface IVideoPlayback{
     handleMediaTimeUpdate:  (event: React.SyntheticEvent<HTMLMediaElement, Event>) => void;
     onMediaLoad: VoidFunction;
     handleOnEnded: VoidFunction;
+    rewindFiveSeconds: VoidFunction;
+    forwardFiveSeconds: VoidFunction;
     getFirsEndPoint: string;
     currentTime: number | null;
     totalDuration:  number | null;
+    volume: number|null;
+    toggleVolume: VoidFunction;
+    updateMediaVolume: (event: ChangeEvent<HTMLInputElement>) => void;
     updateCurrentTime:  (event: ChangeEvent<HTMLInputElement>) => void;
     metaData: IMetaData | undefined;
     playMedia: VoidFunction;
     pauseMedia: VoidFunction;
     getLastEndPoint: string;
-
+    playPrevious: VoidFunction;
+    playNext: VoidFunction;
 }
 export default function VideoPlayback(props: IVideoPlayback){
-    const isPlayBackOpen = useAppSelector(state => state.media.currentlyOnTrack.isPlaybackOpen)
+    const isPlaybackOpen = useAppSelector(state => state.media.currentlyOnTrack.isPlaybackOpen)
     const videoContainerRef = useRef<HTMLElement>(null);
     const dispatch = useAppDispatch();
     const [showVideoController, setShowVideoController] = useState(true);
     const timeout = useRef<NodeJS.Timeout | null>(null);
     const playBackContainerStyle: CSSProperties = useMemo(
         () => {
-            if(isPlayBackOpen){
+            if(isPlaybackOpen){
                 return {
                     position: 'absolute',
                     top: 0,
@@ -39,12 +45,12 @@ export default function VideoPlayback(props: IVideoPlayback){
             }
             return {}
         }, 
-        [isPlayBackOpen]
+        [isPlaybackOpen]
     )
 
     const playBackVideoClass: CSSProperties = useMemo(
         () => {
-            if(isPlayBackOpen){
+            if(isPlaybackOpen){
                 return {
                     height: '100vh',
                     width: '100%',
@@ -55,7 +61,7 @@ export default function VideoPlayback(props: IVideoPlayback){
             }
             return {}
         }, 
-        [isPlayBackOpen]
+        [isPlaybackOpen]
     )
     
     const isVideoInFullScreen = useCallback(() =>{
@@ -65,8 +71,8 @@ export default function VideoPlayback(props: IVideoPlayback){
     },[videoContainerRef.current])
 
       
-    const toggleFullScreen = useCallback(() => {
-        if(isPlayBackOpen){
+    const toggleFullScreen: MouseEventHandler = useCallback((event) => {
+        if(isPlaybackOpen && (event.target as HTMLElement).tagName === 'VIDEO'){
             if(isVideoInFullScreen()){
                 document.exitFullscreen();
                 videoContainerRef.current?.setAttribute('data-fullscreen', 'false')
@@ -75,13 +81,13 @@ export default function VideoPlayback(props: IVideoPlayback){
                 videoContainerRef.current?.setAttribute('data-fullscreen', 'true')
             }
         }
-    }, [videoContainerRef.current, isVideoInFullScreen, isPlayBackOpen])
+    }, [videoContainerRef.current, isVideoInFullScreen, isPlaybackOpen])
 
     const toggleVideoPlayBack = useCallback(() => {
         if(!isVideoInFullScreen()){
             dispatch(togglePlayBack())
         }
-    }, [isPlayBackOpen, isVideoInFullScreen])
+    }, [isPlaybackOpen, isVideoInFullScreen])
 
     const handleVideoController = () => {
         setShowVideoController(true);
@@ -95,33 +101,59 @@ export default function VideoPlayback(props: IVideoPlayback){
     const handleOnMouseMove: MouseEventHandler<HTMLElement> = () =>{
         handleVideoController()
     }
-   
+    
+    const handleMouseClick = () => {
+        handleVideoController()
+    }
+
+    const HandleOnKeyDown = () => {
+        handleVideoController()
+    }
+    useEffect(() => {
+        window.addEventListener('keydown', HandleOnKeyDown)
+        return () => {
+            window.removeEventListener('keydown', HandleOnKeyDown)
+        }
+    }, [HandleOnKeyDown]);
+    
     return (
         <div style={playBackContainerStyle}>
             <div className="relative cursor-default min-w-[80px]" onClick={(e) => e.stopPropagation()}>
-                <div className="absolute w-full z-[100]">{isPlayBackOpen && showVideoController && <Header variant="snap"  onBackClickHandler = {toggleVideoPlayBack}/>}</div>
-                <figure ref={videoContainerRef} onMouseMoveCapture={handleOnMouseMove} data-fullscreen="false" onDoubleClick={toggleFullScreen} >
+                <div className="absolute w-full z-[100]">{isPlaybackOpen && showVideoController && <Header variant="snap"  onBackClickHandler = {toggleVideoPlayBack}/>}</div>
+                <figure ref={videoContainerRef} onClick={handleMouseClick} onMouseMoveCapture={handleOnMouseMove} data-fullscreen="false" onDoubleClick={toggleFullScreen} >
                     <video 
                         style={playBackVideoClass}
                         controls={false}
-                        onClick={!isPlayBackOpen ?  toggleVideoPlayBack: undefined}
+                        onClick={!isPlaybackOpen ?  toggleVideoPlayBack: undefined}
                         className={"h-48 w-full object-cover rounded track-media-title-size"}
                         src={props.path} 
                         ref={props.videoRef}
                         preload="metadata"
                         onTimeUpdate={props.handleMediaTimeUpdate} onLoadedData ={props.onMediaLoad} 
-                        onEnded={props.handleOnEnded}
+                        onEnded={() => {
+                            if(isVideoInFullScreen()){
+                                dispatch(togglePlayBack())
+                            }
+                            props.handleOnEnded()
+                        }}
                     />
-                    {isPlayBackOpen && showVideoController && <div id="video-controls" className="controls absolute w-full bottom-0" data-state="hidden">
+                    {isPlaybackOpen && showVideoController && <div id="video-controls" className="controls absolute w-full bottom-0" data-state="hidden">
                         <MediaSnapController 
-                            getFirsEndPoint={props.getFirsEndPoint} 
-                            currentTime={props.currentTime} 
-                            totalDuration={props.totalDuration} 
-                            updateCurrentTime={props.updateCurrentTime} 
-                            metaData={props.metaData} 
-                            getLastEndPoint={props.getLastEndPoint} 
-                            toggleVideoPlayBack = {toggleVideoPlayBack}
-                            isVideoInFullScreen = {isVideoInFullScreen}
+                            getFirsEndPoint={props.getFirsEndPoint}
+                            currentTime={props.currentTime}
+                            totalDuration={props.totalDuration}
+                            updateCurrentTime={props.updateCurrentTime}
+                            volume={props.volume}
+                            toggleVolume={props.toggleVolume}
+                            updateMediaVolume={props.updateMediaVolume}
+                            metaData={props.metaData}
+                            getLastEndPoint={props.getLastEndPoint}
+                            toggleVideoPlayBack={toggleVideoPlayBack}
+                            isVideoInFullScreen={isVideoInFullScreen}
+                            rewindFiveSeconds={props.rewindFiveSeconds}
+                            forwardFiveSeconds={props.forwardFiveSeconds} 
+                            playPrevious={props.playPrevious} 
+                            playNext={props.playNext}                       
                         />
 		            </div>}
                 </figure>
